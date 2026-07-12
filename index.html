@@ -131,6 +131,15 @@
       background: linear-gradient(90deg, transparent 0%, var(--accent) 35%, var(--accent2) 65%, transparent 100%);
     }
 
+    .modal-box::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0,212,255,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
     .modal-logo {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
@@ -514,14 +523,11 @@
       background: var(--accent-glow);
     }
 
-    /* ── MENSAJES (ESTILO CHATGPT) ──────────────────── */
+    /* ── MENSAJES ───────────────────────────────────── */
     .msg {
       display: flex;
       flex-direction: column;
       animation: msgIn .35s cubic-bezier(0.16,1,0.3,1);
-      width: 100%;
-      max-width: 800px; /* Centrado estilo ChatGPT */
-      margin: 0 auto; 
     }
 
     .msg-user { align-items: flex-end; }
@@ -552,7 +558,7 @@
     .msg-ai .msg-label-dot { background: var(--accent2); }
 
     .msg-bubble {
-      max-width: 100%; /* Permite expandirse completo */
+      max-width: 92%;
       padding: 16px 20px;
       border-radius: 3px;
       font-size: 13px;
@@ -575,7 +581,6 @@
       border: 1px solid var(--border);
       border-left: 2px solid var(--accent2);
       border-radius: 0 3px 3px 3px;
-      width: 100%; /* Llena el ancho completo del max-width de .msg */
     }
 
     .msg-ai .msg-bubble::before {
@@ -676,7 +681,7 @@
       background: linear-gradient(90deg, transparent, rgba(0,212,255,0.2), rgba(123,79,255,0.2), transparent);
     }
 
-    /* ── FILA DE PREVIEW DE IMÁGENES/ARCHIVOS ── */
+    /* ── FILA DE PREVIEW DE IMÁGENES ── */
     #image-preview-bar {
       display: none;
       gap: 8px;
@@ -708,6 +713,7 @@
       border-radius: 3px;
     }
 
+    /* ── SPINNER DE CARGA SOBRE LA IMAGEN ── */
     .img-loading-overlay {
       position: absolute;
       inset: 0;
@@ -774,10 +780,9 @@
       display: flex;
       align-items: stretch;
       gap: 8px;
-      max-width: 800px;
-      margin: 0 auto;
     }
 
+    /* ── BOTÓN DE IMAGEN ── */
     #image-btn {
       background: rgba(123,79,255,0.08);
       border: 1px solid rgba(123,79,255,0.25);
@@ -805,6 +810,7 @@
 
     #image-input { display: none; }
 
+    /* ── BOTÓN DE ENVIAR ── */
     #send-btn {
       background: linear-gradient(135deg, var(--accent) 0%, rgba(0,170,210,1) 100%);
       border: none;
@@ -830,6 +836,7 @@
     #send-btn:disabled { opacity: .35; cursor: not-allowed; }
     #send-btn svg { width: 14px; height: 14px; }
 
+    /* ── INPUT WRAPPER ── */
     .input-wrapper {
       flex: 1;
       display: flex;
@@ -873,6 +880,7 @@
     #user-input::-webkit-scrollbar { width: 2px; }
     #user-input::-webkit-scrollbar-thumb { background: var(--border); }
 
+    /* ── STOP BTN ── */
     #stop-btn {
       display: none;
       background: rgba(255,51,85,0.08);
@@ -964,54 +972,15 @@
       color: var(--accent);
     }
 
-    .code-block-wrapper {
+    .msg-bubble pre {
       background: rgba(0,0,0,0.5);
       border: 1px solid var(--border2);
       border-left: 2px solid var(--accent2);
-      border-radius: 4px;
-      margin: 12px 0;
-      overflow: hidden;
-    }
-
-    .code-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 12px;
-      background: rgba(255,255,255,0.05);
-      border-bottom: 1px solid var(--border2);
-    }
-
-    .code-lang {
-      font-size: 10px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .code-download-btn {
-      background: transparent;
-      border: 1px solid var(--border2);
-      border-radius: 3px;
-      color: var(--accent);
-      font-size: 9px;
-      padding: 4px 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .code-download-btn:hover {
-      background: var(--accent-glow);
-      border-color: var(--accent);
-    }
-
-    .msg-bubble pre {
       padding: 14px 16px;
+      border-radius: 3px;
       overflow-x: auto;
-      margin: 0;
+      margin: 10px 0;
       font-size: 11.5px;
-      background: transparent;
-      border: none;
     }
 
     .msg-bubble pre code {
@@ -1101,6 +1070,7 @@
       background: rgba(255,255,255,0.02);
     }
 
+    /* ── ERROR LATEX ────────────────────────────────── */
     .latex-error {
       display: inline-block;
       background: rgba(255,51,85,0.08);
@@ -1114,6 +1084,7 @@
       opacity: 0.8;
     }
 
+    /* ── IMÁGENES EN BURBUJA DE MENSAJE ────────────── */
     .msg-images {
       display: flex;
       gap: 8px;
@@ -1195,7 +1166,7 @@
 
 <div id="api-modal">
   <div class="modal-box">
-    <div class="modal-logo">Silent <span>IA</span></div>
+    <div class="modal-logo">Silent<span>IA</span></div>
     <div class="modal-sub">Acceso seguro requerido</div>
     <div class="modal-divider"></div>
 
@@ -1208,6 +1179,46 @@
       <button class="lang-btn" data-lang="en" data-prompt="Always respond in English, no exceptions." onclick="selectLang(this)">
         <span class="lang-flag">🇺🇸</span>
         <span class="lang-name">English</span>
+      </button>
+      <button class="lang-btn" data-lang="fr" data-prompt="Réponds toujours en français, sans exception." onclick="selectLang(this)">
+        <span class="lang-flag">🇫🇷</span>
+        <span class="lang-name">Français</span>
+      </button>
+      <button class="lang-btn" data-lang="pt" data-prompt="Responda sempre em português, sem exceções." onclick="selectLang(this)">
+        <span class="lang-flag">🇧🇷</span>
+        <span class="lang-name">Português</span>
+      </button>
+      <button class="lang-btn" data-lang="de" data-prompt="Antworte immer auf Deutsch, ohne Ausnahmen." onclick="selectLang(this)">
+        <span class="lang-flag">🇩🇪</span>
+        <span class="lang-name">Deutsch</span>
+      </button>
+      <button class="lang-btn" data-lang="it" data-prompt="Rispondi sempre in italiano, senza eccezioni." onclick="selectLang(this)">
+        <span class="lang-flag">🇮🇹</span>
+        <span class="lang-name">Italiano</span>
+      </button>
+      <button class="lang-btn" data-lang="ja" data-prompt="常に日本語で回答してください。例外はありません。" onclick="selectLang(this)">
+        <span class="lang-flag">🇯🇵</span>
+        <span class="lang-name">日本語</span>
+      </button>
+      <button class="lang-btn" data-lang="zh" data-prompt="始终用中文回答，没有例外。" onclick="selectLang(this)">
+        <span class="lang-flag">🇨🇳</span>
+        <span class="lang-name">中文</span>
+      </button>
+      <button class="lang-btn" data-lang="ko" data-prompt="항상 한국어로 대답하세요. 예외는 없습니다." onclick="selectLang(this)">
+        <span class="lang-flag">🇰🇷</span>
+        <span class="lang-name">한국어</span>
+      </button>
+      <button class="lang-btn" data-lang="ru" data-prompt="Всегда отвечай на русском языке, без исключений." onclick="selectLang(this)">
+        <span class="lang-flag">🇷🇺</span>
+        <span class="lang-name">Русский</span>
+      </button>
+      <button class="lang-btn" data-lang="ar" data-prompt="أجب دائماً باللغة العربية، بدون استثناءات." onclick="selectLang(this)">
+        <span class="lang-flag">🇸🇦</span>
+        <span class="lang-name">العربية</span>
+      </button>
+      <button class="lang-btn" data-lang="hi" data-prompt="हमेशा हिंदी में जवाब दें, बिना किसी अपवाद के।" onclick="selectLang(this)">
+        <span class="lang-flag">🇮🇳</span>
+        <span class="lang-name">हिन्दी</span>
       </button>
     </div>
 
@@ -1233,7 +1244,7 @@
         </svg>
       </div>
       <div class="brand-text">
-        <div class="brand-name">Silent <span>IA</span></div>
+        <div class="brand-name">Silent<span>IA</span></div>
         <div class="brand-tagline">Powered by Groq · llama-3.3-70b</div>
       </div>
     </div>
@@ -1262,18 +1273,18 @@
       <p>Inteligencia artificial de alto rendimiento.<br/>¿En qué puedo ayudarte hoy?</p>
       <div class="welcome-chips">
         <div class="welcome-chip" onclick="useChip(this)">¿Qué puedes hacer?</div>
-        <div class="welcome-chip" onclick="useChip(this)">Genera un archivo Python</div>
-        <div class="welcome-chip" onclick="useChip(this)">Escribe un script en Luau</div>
-        <div class="welcome-chip" onclick="useChip(this)">Analiza este archivo adjunto</div>
+        <div class="welcome-chip" onclick="useChip(this)">Escribe un poema</div>
+        <div class="welcome-chip" onclick="useChip(this)">Explícame algo</div>
+        <div class="welcome-chip" onclick="useChip(this)">Ayúdame con código</div>
       </div>
     </div>
   </div>
 
   <div id="input-area">
     <div id="image-preview-bar"></div>
-    <input type="file" id="image-input" accept="image/*, text/*, .txt, .lua, .luau, .py, .js, .html, .css, .json" multiple/>
+    <input type="file" id="image-input" accept="image/*" multiple/>
     <div id="input-main-row">
-      <button id="image-btn" onclick="triggerImageUpload()" title="Adjuntar Archivos/Fotos (máx. 3)">
+      <button id="image-btn" onclick="triggerImageUpload()" title="Adjuntar imagen (máx. 3)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
           <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -1294,12 +1305,12 @@
       </button>
     </div>
     <div class="input-footer">
-      <div class="footer-disclaimer"><span>Silent IA</span> puede cometer errores. Verifica información importante.</div>
+      <div class="footer-disclaimer"><span>Silent IA</span> es una IA que puede cometer errores</div>
     </div>
   </div>
 </div>
 
-<div id="copy-toast">✓ Acción completada</div>
+<div id="copy-toast">✓ Copiado</div>
 
 <div id="lightbox">
   <button id="lightbox-close" onclick="closeLightbox()">✕</button>
@@ -1308,21 +1319,22 @@
 
 <script>
   // ── Estado ──────────────────────────────────────────────
-  let apiKey = localStorage.getItem('silent_groq_key') || '';
+  let apiKey = localStorage.getItem('dm_groq_key') || '';
   let messages = [];
   let abortController = null;
   let isGenerating = false;
-  let cooldownRemaining = 0; // TEMPORIZADOR
-  let cooldownTimer = null; // TEMPORIZADOR
-  let selectedLangPrompt = localStorage.getItem('silent_lang_prompt') || 'Responde siempre en español, sin excepciones.';
-  let selectedLangCode = localStorage.getItem('silent_lang_code') || 'es';
+  let selectedLangPrompt = localStorage.getItem('dm_lang_prompt') || 'Responde siempre en español, sin excepciones.';
+  let selectedLangCode = localStorage.getItem('dm_lang_code') || 'es';
 
-  // ── Modelos de Groq
+  // ── Modelos independientes ────────────────────────────────
   const MODEL_TEXT = 'llama-3.3-70b-versatile';
-  const MODEL_VISION = 'llama-3.2-11b-vision-preview';
+  const MODEL_VISION = 'meta-llama/llama-4-scout-17b-16e-instruct';
 
+  // ── Estado de imágenes ───────────────────────────────────
   let pendingImages = [];
   let imagesLoadingCount = 0;
+
+  // Control de auto-scroll
   let userScrolledUp = false;
 
   const messagesEl = document.getElementById('messages');
@@ -1338,14 +1350,15 @@
     }
   }
 
-  // ── Modificado para conocimientos extra de programación (Lua/Luau) ──
-  const BASE_SYSTEM_PROMPT = `Eres Silent IA, un asistente avanzado, directo y de alto rendimiento. Eres un experto senior en programación, especialmente en el ecosistema de Lua, Luau (Roblox Studio), Python, C++ y desarrollo en general. Entregas código limpio, seguro, optimizado y explicas la lógica claramente paso a paso. Formato:
+  // ── System prompt optimizado (menos tokens) ──────────────
+  const BASE_SYSTEM_PROMPT = `Eres Silent IA. Formato:
 - Markdown: **negrita**, *cursiva*, # títulos, listas con -, código con triple backtick.
 - Matemáticas: LaTeX inline $formula$, bloque $$formula$$.
-- ARCHIVOS: Si el usuario te pide crear, generar o devolver un archivo, proporciona el contenido exclusivamente dentro de un bloque de código Markdown especificando el lenguaje correcto (ej. \`\`\`lua). La interfaz de usuario le proporcionará un botón para descargarlo y copiarlo.
-- IMÁGENES: Si el usuario te pide mostrar o generar una imagen, utiliza el formato Markdown estándar ![descripcion](URL) usando URLs públicas que coincidan con la descripción.
+- LaTeX: \\left( y \\right) al mismo nivel. Cada paso en bloque $$...$$. Sin saltos dentro de $$.
+- Problemas: **Datos:** **Fórmula:** **Desarrollo:** **Resultado:**
 - Secciones: ## y ###. Pasos numerados.`;
 
+  // ── Init ────────────────────────────────────────────────
   window.onload = () => {
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.classList.remove('selected');
@@ -1356,6 +1369,7 @@
     initImageInput();
   };
 
+  // ── Altura dinámica móvil ────────────────────────────────
   function setDynamicHeight() {
     const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     document.getElementById('app').style.height = vh + 'px';
@@ -1382,18 +1396,9 @@
       ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
     });
     ta.addEventListener('keydown', e => {
-      // Detección de dispositivo móvil/pantalla pequeña
-      const isMobile = window.innerWidth <= 768;
-      
       if (e.key === 'Enter' && !e.shiftKey) {
-        if (isMobile) {
-          // En móviles, Enter baja un renglón naturalmente (no previene comportamiento)
-          return;
-        } else {
-          // En PC, Enter envía el mensaje
-          e.preventDefault();
-          if (!isGenerating && cooldownRemaining <= 0) sendMessage();
-        }
+        e.preventDefault();
+        if (!isGenerating) sendMessage();
       }
     });
   }
@@ -1408,10 +1413,11 @@
     btn.classList.add('selected');
     selectedLangPrompt = btn.dataset.prompt;
     selectedLangCode = btn.dataset.lang;
-    localStorage.setItem('silent_lang_prompt', selectedLangPrompt);
-    localStorage.setItem('silent_lang_code', selectedLangCode);
+    localStorage.setItem('dm_lang_prompt', selectedLangPrompt);
+    localStorage.setItem('dm_lang_code', selectedLangCode);
   }
 
+  // ── API Key ──────────────────────────────────────────────
   async function saveApiKey() {
     const input = document.getElementById('api-key-input');
     const key = input.value.trim();
@@ -1437,7 +1443,7 @@
 
       if (res.ok) {
         apiKey = key;
-        localStorage.setItem('silent_groq_key', key);
+        localStorage.setItem('dm_groq_key', key);
         showApp();
       } else {
         const err = await res.json();
@@ -1455,7 +1461,7 @@
 
   function resetApiKey() {
     if (confirm('¿Cambiar la API key?')) {
-      localStorage.removeItem('silent_groq_key');
+      localStorage.removeItem('dm_groq_key');
       apiKey = '';
       messages = [];
       document.getElementById('api-modal').style.display = 'flex';
@@ -1464,6 +1470,7 @@
     }
   }
 
+  // ── IMAGEN: inicialización del input ─────────────────────
   function initImageInput() {
     const imgInput = document.getElementById('image-input');
     imgInput.addEventListener('change', handleImageFiles);
@@ -1474,6 +1481,7 @@
     document.getElementById('image-input').click();
   }
 
+  // ── Procesar archivos de imagen seleccionados ────────────
   function handleImageFiles(e) {
     const files = Array.from(e.target.files);
     e.target.value = '';
@@ -1482,42 +1490,17 @@
     const toAdd = files.slice(0, slots);
 
     toAdd.forEach(file => {
-      // Verifica si es imagen para subir como visión, o si es archivo para extraer texto
-      if (file.type.startsWith('image/')) {
-        const previewUrl = URL.createObjectURL(file);
-        const entry = { file, base64: null, mediaType: file.type, ready: false, previewUrl, isImage: true };
-        pendingImages.push(entry);
-        addImagePreviewItem(entry);
-        readFileAsBase64(entry);
-      } else {
-        const entry = { file, textContent: null, isImage: false, ready: false };
-        pendingImages.push(entry);
-        addFilePreviewItem(entry);
-        readTextFile(entry);
-      }
+      const previewUrl = URL.createObjectURL(file);
+      const entry = { file, base64: null, mediaType: file.type, ready: false, previewUrl };
+      pendingImages.push(entry);
+      addImagePreviewItem(entry);
+      readFileAsBase64(entry);
     });
 
     refreshImagePreviewBar();
   }
 
-  function readTextFile(entry) {
-    imagesLoadingCount++;
-    updateSendButtonState();
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      entry.textContent = ev.target.result;
-      entry.ready = true;
-      imagesLoadingCount--;
-      const overlay = entry._overlayEl;
-      if (overlay) {
-        overlay.classList.add('done');
-        setTimeout(() => overlay.remove(), 350);
-      }
-      updateSendButtonState();
-    };
-    reader.readAsText(entry.file);
-  }
-
+  // ── Leer archivo como base64 y marcar como listo ─────────
   function readFileAsBase64(entry) {
     imagesLoadingCount++;
     updateSendButtonState();
@@ -1540,44 +1523,7 @@
     reader.readAsDataURL(entry.file);
   }
 
-  function addFilePreviewItem(entry) {
-    const bar = document.getElementById('image-preview-bar');
-    const item = document.createElement('div');
-    item.className = 'img-preview-item';
-    item.style.display = 'flex';
-    item.style.alignItems = 'center';
-    item.style.justifyContent = 'center';
-    item.style.background = 'var(--surface2)';
-    item.style.color = 'var(--accent)';
-    item.style.fontSize = '9px';
-    item.style.textAlign = 'center';
-    item.style.padding = '4px';
-    item.style.wordBreak = 'break-all';
-    
-    // Extensión del archivo visible
-    const ext = entry.file.name.split('.').pop().substring(0,4);
-    item.innerHTML = `<span style="font-weight:bold;text-transform:uppercase;">.${ext}</span>`;
-
-    const overlay = document.createElement('div');
-    overlay.className = 'img-loading-overlay';
-    const spinner = document.createElement('div');
-    spinner.className = 'img-spinner';
-    overlay.appendChild(spinner);
-
-    entry._overlayEl = overlay;
-    entry._itemEl = item;
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'img-remove-btn';
-    removeBtn.innerHTML = '✕';
-    removeBtn.title = 'Quitar archivo';
-    removeBtn.addEventListener('click', () => removeImage(entry));
-
-    item.appendChild(overlay);
-    item.appendChild(removeBtn);
-    bar.appendChild(item);
-  }
-
+  // ── Añadir un elemento de preview en la barra ────────────
   function addImagePreviewItem(entry) {
     const bar = document.getElementById('image-preview-bar');
 
@@ -1610,15 +1556,17 @@
     bar.appendChild(item);
   }
 
+  // ── Quitar una imagen de la lista ────────────────────────
   function removeImage(entry) {
     if (entry._itemEl) entry._itemEl.remove();
     if (!entry.ready) imagesLoadingCount = Math.max(0, imagesLoadingCount - 1);
-    if(entry.previewUrl) URL.revokeObjectURL(entry.previewUrl);
+    URL.revokeObjectURL(entry.previewUrl);
     pendingImages = pendingImages.filter(e => e !== entry);
     refreshImagePreviewBar();
     updateSendButtonState();
   }
 
+  // ── Mostrar u ocultar la barra de preview ────────────────
   function refreshImagePreviewBar() {
     const bar = document.getElementById('image-preview-bar');
     if (pendingImages.length > 0) {
@@ -1628,41 +1576,19 @@
     }
   }
 
+  // ── Habilitar/deshabilitar el botón de envío ─────────────
   function updateSendButtonState() {
     const sendBtn = document.getElementById('send-btn');
-    if (imagesLoadingCount > 0 || isGenerating || cooldownRemaining > 0) {
+    if (imagesLoadingCount > 0 || isGenerating) {
       sendBtn.disabled = true;
-      if (cooldownRemaining > 0 && !isGenerating) {
-        sendBtn.innerHTML = `<span style="font-size:11px; font-family:'Syne'; font-weight:700;">${cooldownRemaining}s</span>`;
-      } else {
-        sendBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>`;
-      }
     } else {
       sendBtn.disabled = false;
-      sendBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-      </svg>`;
     }
   }
 
-  function startCooldown() {
-    cooldownRemaining = 3; // 3 segundos de enfriamiento para prevenir spam
-    updateSendButtonState();
-    
-    if(cooldownTimer) clearInterval(cooldownTimer);
-    cooldownTimer = setInterval(() => {
-      cooldownRemaining--;
-      updateSendButtonState();
-      if (cooldownRemaining <= 0) {
-        clearInterval(cooldownTimer);
-      }
-    }, 1000);
-  }
-
+  // ── Limpiar imágenes pendientes tras enviar ───────────────
   function clearPendingImages() {
-    pendingImages.forEach(e => { if(e.previewUrl) URL.revokeObjectURL(e.previewUrl); });
+    pendingImages.forEach(e => URL.revokeObjectURL(e.previewUrl));
     pendingImages = [];
     imagesLoadingCount = 0;
     const bar = document.getElementById('image-preview-bar');
@@ -1670,6 +1596,7 @@
     bar.classList.remove('has-images');
   }
 
+  // ── Actualizar botón Regenerar: solo visible en el último msg IA ──
   function updateRegenButtons() {
     const allRegenBtns = messagesEl.querySelectorAll('.regen-btn');
     allRegenBtns.forEach(btn => btn.style.display = 'none');
@@ -1678,27 +1605,19 @@
     }
   }
 
+  // ── Enviar mensaje ───────────────────────────────────────
   async function sendMessage() {
     const input = document.getElementById('user-input');
     const text = input.value.trim();
     const hasImages = pendingImages.length > 0;
 
-    if ((!text && !hasImages) || isGenerating || cooldownRemaining > 0) return;
+    if ((!text && !hasImages) || isGenerating) return;
     if (imagesLoadingCount > 0) return;
 
     const welcome = document.querySelector('.welcome');
     if (welcome) welcome.remove();
 
-    // Ensamblar archivos de texto si existen
-    let textPrompt = text;
-    const filesToSend = pendingImages.filter(e => e.ready && !e.isImage);
-    if (filesToSend.length > 0) {
-        filesToSend.forEach(f => {
-            textPrompt += `\n\n--- Archivo Adjunto: ${f.file.name} ---\n${f.textContent}\n--- Fin de Archivo ---`;
-        });
-    }
-
-    const imagesToSend = pendingImages.filter(e => e.ready && e.isImage);
+    const imagesToSend = pendingImages.filter(e => e.ready);
     const modelToUse = imagesToSend.length > 0 ? MODEL_VISION : MODEL_TEXT;
 
     let userContent;
@@ -1710,17 +1629,17 @@
           image_url: { url: `data:${entry.mediaType};base64,${entry.base64}` }
         });
       });
-      if (textPrompt) {
-        userContent.push({ type: 'text', text: textPrompt });
+      if (text) {
+        userContent.push({ type: 'text', text: text });
       } else {
-        userContent.push({ type: 'text', text: 'Analiza detalladamente esto.' });
+        userContent.push({ type: 'text', text: 'Analiza y describe detalladamente esta imagen.' });
       }
     } else {
-      userContent = textPrompt;
+      userContent = text;
     }
 
     messages.push({ role: 'user', content: userContent });
-    appendUserMessage(text, pendingImages.filter(e => e.ready));
+    appendUserMessage(text, imagesToSend);
 
     input.value = '';
     input.style.height = 'auto';
@@ -1736,7 +1655,7 @@
     const messagesForApi = messages.map(m => {
       if (modelToUse === MODEL_TEXT && Array.isArray(m.content)) {
         const textParts = m.content.filter(c => c.type === 'text').map(c => c.text).join(' ');
-        return { role: m.role, content: textParts || '[imagen o archivo enviado]' };
+        return { role: m.role, content: textParts || '[imagen enviada]' };
       }
       return m;
     });
@@ -1759,7 +1678,6 @@
         typingEl.remove();
         appendAiMessage('⚠ Error: ' + (err.error?.message || 'Error desconocido.'));
         setGenerating(false);
-        startCooldown();
         return;
       }
 
@@ -1807,13 +1725,11 @@
     }
 
     setGenerating(false);
-    startCooldown();
   }
 
   function stopGeneration() {
     if (abortController) { abortController.abort(); abortController = null; }
     setGenerating(false);
-    startCooldown();
   }
 
   function setGenerating(val) {
@@ -1822,7 +1738,8 @@
     document.getElementById('stop-btn').style.display = val ? 'flex' : 'none';
   }
 
-  function appendUserMessage(text, items) {
+  // ── appendUserMessage ─────────────────────────────────────
+  function appendUserMessage(text, images) {
     const msgEl = document.createElement('div');
     msgEl.className = 'msg msg-user';
 
@@ -1831,32 +1748,16 @@
     labelEl.innerHTML = '<span class="msg-label-dot"></span>Tú';
     msgEl.appendChild(labelEl);
 
-    if (items && items.length > 0) {
+    if (images && images.length > 0) {
       const imagesRow = document.createElement('div');
       imagesRow.className = 'msg-images';
-      items.forEach(entry => {
-        if(entry.isImage) {
-          const imgEl = document.createElement('img');
-          imgEl.className = 'msg-img-thumb';
-          imgEl.src = entry.previewUrl;
-          imgEl.alt = 'Imagen adjunta';
-          imgEl.addEventListener('click', () => openLightbox(entry.previewUrl));
-          imagesRow.appendChild(imgEl);
-        } else {
-          const docEl = document.createElement('div');
-          docEl.className = 'msg-img-thumb';
-          docEl.style.display = 'flex';
-          docEl.style.alignItems = 'center';
-          docEl.style.justifyContent = 'center';
-          docEl.style.background = 'rgba(0,212,255,0.05)';
-          docEl.style.color = 'var(--accent)';
-          docEl.style.fontSize = '10px';
-          docEl.style.textAlign = 'center';
-          docEl.style.padding = '4px';
-          docEl.style.wordBreak = 'break-word';
-          docEl.innerHTML = `📄<br>${entry.file.name}`;
-          imagesRow.appendChild(docEl);
-        }
+      images.forEach(entry => {
+        const imgEl = document.createElement('img');
+        imgEl.className = 'msg-img-thumb';
+        imgEl.src = entry.previewUrl;
+        imgEl.alt = 'Imagen adjunta';
+        imgEl.addEventListener('click', () => openLightbox(entry.previewUrl));
+        imagesRow.appendChild(imgEl);
       });
       msgEl.appendChild(imagesRow);
     }
@@ -1929,6 +1830,7 @@
     renderMath(bubble, () => scrollToBottom(true));
   }
 
+  // ── Botones de acción ────────────────────────────────────
   function addMessageActions(msgEl, text) {
     const actionsEl = document.createElement('div');
     actionsEl.className = 'msg-actions';
@@ -1962,15 +1864,6 @@
     msgEl.appendChild(actionsEl);
   }
 
-  function showToast(msg) {
-    const toast = document.getElementById('copy-toast');
-    toast.textContent = msg || '✓ Acción completada';
-    toast.classList.add('show');
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 2000);
-  }
-
   function copyText(text, btn) {
     const originalHTML = btn.innerHTML;
 
@@ -1983,8 +1876,10 @@
       `;
       btn.style.color = 'var(--accent)';
       btn.style.borderColor = 'rgba(0,212,255,0.4)';
-      showToast('✓ Texto copiado');
+      const toast = document.getElementById('copy-toast');
+      toast.classList.add('show');
       setTimeout(() => {
+        toast.classList.remove('show');
         btn.innerHTML = originalHTML;
         btn.style.color = '';
         btn.style.borderColor = '';
@@ -2017,59 +1912,13 @@
     document.body.removeChild(ta);
   }
 
-  // ── NUEVO: Botón para copiar solo el código del bloque ──
-  function copyCodeSnippet(btn) {
-    const codeBlock = btn.closest('.code-block-wrapper').querySelector('code');
-    if (!codeBlock) return;
-    const text = codeBlock.innerText || codeBlock.textContent;
-    
-    const originalHTML = btn.innerHTML;
-    const doSuccess = () => {
-      btn.innerHTML = '✓ Copiado';
-      btn.style.color = 'var(--accent)';
-      showToast('✓ Código copiado');
-      setTimeout(() => {
-        btn.innerHTML = originalHTML;
-        btn.style.color = '';
-      }, 2000);
-    };
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(doSuccess).catch(() => fallbackCopy(text, doSuccess));
-    } else {
-      fallbackCopy(text, doSuccess);
-    }
-  }
-
-  function downloadCode(btn, lang) {
-    const codeBlock = btn.parentElement.nextElementSibling.querySelector('code');
-    if (!codeBlock) return;
-    
-    let textToSave = codeBlock.innerText || codeBlock.textContent;
-    let extension = lang.toLowerCase() || 'txt';
-    const extMap = {
-      'python': 'py', 'javascript': 'js', 'typescript': 'ts', 
-      'html': 'html', 'css': 'css', 'json': 'json', 'bash': 'sh', 'luau': 'lua'
-    };
-    extension = extMap[extension] || extension;
-    
-    const blob = new Blob([textToSave], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `silent_ai_snippet.${extension}`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showToast('✓ Archivo descargado');
-  }
-
   async function regenerate(msgEl) {
-    if (isGenerating || cooldownRemaining > 0) return;
+    if (isGenerating) return;
 
+    // Quitar el último mensaje del array si es del asistente
     if (messages[messages.length - 1]?.role === 'assistant') messages.pop();
+
+    // Eliminar el elemento del DOM
     msgEl.remove();
 
     userScrolledUp = false;
@@ -2085,13 +1934,14 @@
     const messagesForApi = messages.map(m => {
       if (modelToUse === MODEL_TEXT && Array.isArray(m.content)) {
         const textParts = m.content.filter(c => c.type === 'text').map(c => c.text).join(' ');
-        return { role: m.role, content: textParts || '[imagen o archivo enviado]' };
+        return { role: m.role, content: textParts || '[imagen enviada]' };
       }
       return m;
     });
 
+    // Añadir instrucción para que la IA revise y corrija su respuesta anterior
     const messagesWithSystem = [
-      { role: 'system', content: BASE_SYSTEM_PROMPT + '\n\n' + selectedLangPrompt + '\n\nIMPORTANTE: Revisa tu respuesta anterior, corrige posibles imprecisiones y proporciona una versión mejorada.' },
+      { role: 'system', content: BASE_SYSTEM_PROMPT + '\n\n' + selectedLangPrompt + '\n\nIMPORTANTE: El usuario ha pedido regenerar tu última respuesta porque puede contener errores. Revisa cuidadosamente tu respuesta anterior, identifica posibles errores o imprecisiones, y proporciona una respuesta corregida y mejorada.' },
       ...messagesForApi
     ];
 
@@ -2143,9 +1993,9 @@
     }
 
     setGenerating(false);
-    startCooldown();
   }
 
+  // ── LIGHTBOX ─────────────────────────────────────────────
   function openLightbox(src) {
     const lb = document.getElementById('lightbox');
     const lbImg = document.getElementById('lightbox-img');
@@ -2161,8 +2011,10 @@
     if (e.target === this) closeLightbox();
   });
 
+  // ── sanitizeLaTeX ────────────────────────────────────────
   function sanitizeLaTeX(latex) {
     let s = latex;
+
     let prev = '';
     let iter = 0;
     while (prev !== s && iter < 10) {
@@ -2193,20 +2045,28 @@
     return s;
   }
 
+  // ── autoWrapLaTeX ────────────────────────────────────────
   function autoWrapLaTeX(text) {
     return text.split('\n').map(line => {
       const trimmed = line.trim();
+
       if (!trimmed) return line;
+
       if (trimmed.includes('$') || trimmed.includes('\\[') || trimmed.includes('\\(')) return line;
+
       if (/^<[a-zA-Z]/.test(trimmed)) return line;
+
       if (/^(#{1,6}\s|[-*+]\s|>\s|\d+\.\s)/.test(trimmed)) return line;
+
       if (/^\\[a-zA-Z]/.test(trimmed)) {
         return '$$' + trimmed + '$$';
       }
+
       return line;
     }).join('\n');
   }
 
+  // ── Renderizar MathJax ───────────────────────────────────
   function renderMath(el, callback) {
     if (window.MathJax && window.MathJax.typesetPromise) {
       const bubble = el.closest ? el.closest('.msg-bubble') : el;
@@ -2236,6 +2096,7 @@
     }
   }
 
+  // ── Formatear Markdown protegiendo LaTeX ─────────────────
   function formatMarkdown(raw) {
     const mathStore = [];
 
@@ -2280,38 +2141,13 @@
       .replace(/>/g, '&gt;');
 
     const codeStore = [];
-    
-    // ── NUEVO: Botón de copiar añadido junto al de descargar en los bloques de código ──
     text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
-      const safeLang = lang || 'txt';
-      const html = `
-        <div class="code-block-wrapper">
-          <div class="code-header">
-            <span class="code-lang">${safeLang}</span>
-            <div style="display:flex; gap:6px;">
-              <button class="code-download-btn" onclick="copyCodeSnippet(this)" title="Copiar código">
-                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:middle;">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>Copiar
-              </button>
-              <button class="code-download-btn" onclick="downloadCode(this, '${safeLang}')" title="Descargar archivo">
-                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:middle;">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>Descargar
-              </button>
-            </div>
-          </div>
-          <pre><code class="language-${safeLang}">${code.trim()}</code></pre>
-        </div>`;
+      const html = `<pre><code class="language-${lang}">${code.trim()}</code></pre>`;
       codeStore.push(html);
       return `\x00CODE${codeStore.length - 1}\x00`;
     });
 
     text = text.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-
-    text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; border-radius: 4px; border: 1px solid var(--border2); margin: 10px 0; cursor: pointer;" onclick="openLightbox(\'$2\')" />');
-    
-    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(0,212,255,0.4); padding-bottom:1px;">$1</a>');
 
     text = text.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
     text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
@@ -2357,20 +2193,20 @@
           html += '</tr>';
         }
       });
-      html += '</tbody></table>'; 
+      html += '</tbody></table>';
       return html;
     });
 
     text = text.replace(/\n\n+/g, '</p><p>');
     text = text.replace(/\n/g, '<br>');
 
-    if (!/^<(h[1-6]|ul|ol|pre|blockquote|table|hr|p|div|img)/.test(text.trim())) {
+    if (!/^<(h[1-6]|ul|ol|pre|blockquote|table|hr|p)/.test(text.trim())) {
       text = `<p>${text}</p>`;
     }
 
     text = text.replace(/<p><\/p>/g, '');
-    text = text.replace(/<p>(<(?:h[1-6]|ul|ol|pre|blockquote|table|hr|div|img)[^>]*>)/g, '$1');
-    text = text.replace(/((?:<\/h[1-6]>|<\/ul>|<\/ol>|<\/pre>|<\/blockquote>|<\/table>|<hr>|<\/div>|>))<\/p>/g, '$1');
+    text = text.replace(/<p>(<(?:h[1-6]|ul|ol|pre|blockquote|table|hr)[^>]*>)/g, '$1');
+    text = text.replace(/((?:<\/h[1-6]>|<\/ul>|<\/ol>|<\/pre>|<\/blockquote>|<\/table>|<hr>))<\/p>/g, '$1');
 
     text = text.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeStore[parseInt(i)]);
     text = text.replace(/\x00MATH(\d+)\x00/g, (_, i) => mathStore[parseInt(i)]);
