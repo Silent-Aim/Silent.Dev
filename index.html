@@ -1,30 +1,25 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-  <title>Silent IA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <title>Gemini Custom Interface - Pro</title>
+  
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  
+  <!-- Highlight.js para colores de lenguajes de programación (Tema Oscuro) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
+  <!-- Marked.js para interpretar el Markdown correctamente -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+  <!-- MathJax para Matemáticas (Fórmulas complejas) -->
   <script>
     window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        processEscapes: true,
-        processEnvironments: true
-      },
-      svg: {
-        fontCache: 'global'
-      },
-      options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-      },
-      startup: {
-        ready() {
-          MathJax.startup.defaultReady();
-        }
-      }
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
     };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
@@ -33,1369 +28,227 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #060810;
-      --surface: #0c1018;
-      --surface2: #111828;
-      --border: #1a2840;
-      --border2: #243550;
-      --accent: #00d4ff;
-      --accent2: #7b4fff;
-      --accent3: #ff6b35;
-      --accent-glow: rgba(0,212,255,0.12);
-      --accent2-glow: rgba(123,79,255,0.12);
-      --text: #dde6f5;
-      --text-dim: #4a6080;
-      --text-muted: #253348;
-      --user-bubble: #0a1a2e;
-      --ai-bubble: #080f1c;
-      --danger: #ff3355;
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --bg: #131314;
+      --surface: #1e1f20;
+      --surface2: #282a2c;
+      --border: #333538;
+      --border2: #444746;
+      --text: #e3e3e3;
+      --text-dim: #c4c7c5;
+      --text-muted: #8e918f;
+      --user-bubble: #282a2c;
+      --ai-bubble: transparent;
+      --accent: #a8c7fa;
+      --danger: #f28b82;
+      --gemini-gradient: linear-gradient(74deg, #4285f4 0, #9b72cb 9%, #d96570 20%, #d96570 24%, #9b72cb 35%, #4285f4 44%, #9b72cb 50%, #d96570 56%, #131314 75%, #131314 100%);
     }
 
-    html {
-      height: 100%;
-      height: -webkit-fill-available;
-    }
-
+    html { height: 100%; height: -webkit-fill-available; }
     body {
-      height: 100vh;
-      height: 100dvh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      height: 100vh; height: 100dvh;
+      background: var(--bg); color: var(--text);
+      font-family: 'Google Sans', -apple-system, sans-serif;
+      overflow: hidden; display: flex; flex-direction: column;
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 70% 50% at 15% 5%, rgba(0,212,255,0.05) 0%, transparent 55%),
-        radial-gradient(ellipse 60% 60% at 85% 95%, rgba(123,79,255,0.06) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 40% at 60% 30%, rgba(0,212,255,0.025) 0%, transparent 60%),
-        radial-gradient(ellipse 30% 30% at 30% 70%, rgba(123,79,255,0.03) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── MODAL ──────────────────────────────────────── */
+    /* ── MODAL DE ACCESO ──────────────────────────────────────── */
     #api-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(4,6,10,0.96);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      animation: fadeIn .3s ease;
-      padding: 20px;
-      padding-bottom: calc(20px + var(--safe-bottom));
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(19, 19, 20, 0.9); backdrop-filter: blur(8px); padding: 20px;
     }
+    .modal-box { width: 100%; max-width: 440px; background: var(--surface); border-radius: 24px; padding: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .modal-logo { font-size: 24px; font-weight: 500; margin-bottom: 24px; background: var(--gemini-gradient); background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .modal-label { font-size: 14px; font-weight: 500; margin-bottom: 12px; }
+    .modal-input { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 12px; color: var(--text); padding: 14px 16px; outline: none; margin-bottom: 8px; }
+    .modal-input:focus { border-color: var(--accent); }
+    .modal-error { font-size: 13px; color: var(--danger); margin-bottom: 12px; display: none; }
+    .modal-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+    .modal-hint a { color: var(--accent); text-decoration: none; }
+    .btn-primary { width: 100%; background: var(--accent); color: #041e49; font-weight: 500; border: none; border-radius: 24px; padding: 12px; cursor: pointer; }
+    .btn-primary:hover { opacity: 0.9; }
 
-    .modal-box {
-      position: relative;
-      width: 100%;
-      max-width: 440px;
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      padding: 40px 36px 36px;
-      animation: slideUp .4s cubic-bezier(0.16,1,0.3,1);
-      max-height: 88vh;
-      overflow-y: auto;
+    /* ── DISEÑO GENERAL ────────────────────────────────────── */
+    #app { display: none; flex-direction: column; height: 100vh; height: 100dvh; position: relative; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; flex-shrink: 0; }
+    .header-brand { font-size: 20px; font-weight: 500; color: var(--text-dim); }
+    
+    .model-selector select {
+      appearance: none; background: var(--surface2); color: var(--text); border: none; padding: 8px 36px 8px 16px; font-family: inherit; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; outline: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23c4c7c5%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center;
     }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .btn-icon { background: transparent; border: none; color: var(--text-dim); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .btn-icon:hover { background: var(--surface2); }
 
-    .modal-box::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent 0%, var(--accent) 35%, var(--accent2) 65%, transparent 100%);
-    }
+    /* ── CHAT Y MENSAJES ───────────────────────────────────── */
+    #messages-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; scroll-behavior: smooth; }
+    #messages { width: 100%; max-width: 800px; padding: 24px 20px 100px; display: flex; flex-direction: column; gap: 32px; }
+    #messages::-webkit-scrollbar { width: 6px; }
+    #messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-    .modal-logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 28px;
-      letter-spacing: -1px;
-      margin-bottom: 4px;
-      position: relative;
-      z-index: 1;
-    }
+    .welcome { padding: 40px 20px; animation: fadeIn .8s ease; max-width: 800px; width: 100%; margin: 10vh auto auto; }
+    .welcome h2 { font-size: 40px; font-weight: 500; margin-bottom: 8px; background: var(--gemini-gradient); background-size: 300% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradientShift 6s ease infinite; }
+    .welcome p { font-size: 40px; font-weight: 500; color: #444746; margin-bottom: 40px; }
 
-    .modal-logo span { color: var(--accent); }
-
-    .modal-sub {
-      font-size: 10px;
-      color: var(--text-dim);
-      letter-spacing: 3.5px;
-      text-transform: uppercase;
-      margin-bottom: 28px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .modal-divider {
-      height: 1px;
-      background: linear-gradient(90deg, var(--border2), transparent);
-      margin-bottom: 24px;
-    }
-
-    .modal-label {
-      font-size: 9px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-bottom: 10px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .lang-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
-      margin-bottom: 24px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .lang-btn {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      color: var(--text-dim);
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      padding: 8px 4px 7px;
-      cursor: pointer;
-      transition: all .15s;
-      text-align: center;
-      line-height: 1.2;
-    }
-
-    .lang-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-glow);
-    }
-
-    .lang-btn.selected {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-glow);
-      box-shadow: 0 0 10px rgba(0,212,255,0.15), inset 0 0 10px rgba(0,212,255,0.05);
-    }
-
-    .lang-btn .lang-flag {
-      display: block;
-      font-size: 17px;
-      margin-bottom: 4px;
-    }
-
-    .lang-btn .lang-name {
-      display: block;
-      font-size: 8px;
-      letter-spacing: 0.5px;
-    }
-
-    .modal-input {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      font-size: 12.5px;
-      padding: 13px 16px;
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .modal-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px rgba(0,212,255,0.08);
-    }
-
-    .modal-input::placeholder { color: var(--text-muted); }
-
-    .modal-error {
-      font-size: 10px;
-      color: var(--danger);
-      margin-bottom: 10px;
-      display: none;
-      position: relative;
-      z-index: 1;
-    }
-
-    .modal-hint {
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-      line-height: 1.6;
-      position: relative;
-      z-index: 1;
-    }
-
-    .modal-hint a { color: rgba(0,212,255,0.6); text-decoration: none; }
-    .modal-hint a:hover { color: var(--accent); }
-
-    .btn-primary {
-      width: 100%;
-      background: linear-gradient(135deg, var(--accent) 0%, rgba(0,180,220,1) 100%);
-      color: #000;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 12px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      border: none;
-      border-radius: 3px;
-      padding: 15px;
-      cursor: pointer;
-      transition: opacity .15s, box-shadow .2s, transform .1s;
-      position: relative;
-      z-index: 1;
-    }
-
-    .btn-primary:hover {
-      box-shadow: 0 0 30px rgba(0,212,255,0.35), 0 4px 20px rgba(0,212,255,0.2);
-      transform: translateY(-1px);
-    }
-
-    .btn-primary:active { transform: translateY(0); }
-
-    /* ── APP LAYOUT ────────────────────────────────────── */
-    #app {
-      display: none;
-      flex-direction: column;
-      height: 100vh;
-      height: 100dvh;
-      position: relative;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 22px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(6,8,16,0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 10;
-    }
-
-    header::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.3), transparent);
-    }
-
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-mark {
-      width: 34px;
-      height: 34px;
-      flex-shrink: 0;
-      position: relative;
-    }
-
-    .logo-mark svg { width: 100%; height: 100%; }
-
-    .logo-ring {
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 1px solid rgba(0,212,255,0.2);
-      animation: ringPulse 3s infinite;
-    }
-
-    .brand-name {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 17px;
-      letter-spacing: -0.5px;
-      line-height: 1;
-    }
-
-    .brand-name span { color: var(--accent); }
-
-    .brand-tagline {
-      font-size: 8.5px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-top: 3px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 9px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      background: rgba(0,212,255,0.05);
-      border: 1px solid rgba(0,212,255,0.1);
-      border-radius: 20px;
-      padding: 5px 10px;
-    }
-
-    .status-dot-live {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 6px var(--accent);
-      animation: pulse 2s infinite;
-    }
-
-    .btn-reset {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border2);
-      border-radius: 3px;
-      color: var(--text-dim);
-      font-family: 'DM Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 7px 12px;
-      cursor: pointer;
-      transition: all .2s;
-    }
-
-    .btn-reset:hover {
-      border-color: rgba(0,212,255,0.4);
-      color: var(--accent);
-      background: var(--accent-glow);
-    }
-
-    /* ── MESSAGES ───────────────────────────────────── */
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 28px 20px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-    }
-
-    #messages::-webkit-scrollbar { width: 3px; }
-    #messages::-webkit-scrollbar-track { background: transparent; }
-    #messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-    .welcome {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px 20px;
-      flex: 1;
-      animation: fadeIn .8s ease;
-    }
-
-    .welcome-orb {
-      position: relative;
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 28px;
-    }
-
-    .welcome-orb-ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 1px solid rgba(0,212,255,0.2);
-      animation: orbRing 4s linear infinite;
-    }
-
-    .welcome-orb-ring:nth-child(2) {
-      inset: 6px;
-      border-color: rgba(123,79,255,0.2);
-      animation-direction: reverse;
-      animation-duration: 6s;
-    }
-
-    .welcome-orb-core {
-      position: absolute;
-      inset: 16px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .welcome h2 {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 24px;
-      letter-spacing: -0.5px;
-      margin-bottom: 10px;
-      line-height: 1.2;
-    }
-
-    .welcome h2 span { color: var(--accent); }
-
-    .welcome p {
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: 0.5px;
-      line-height: 1.8;
-      max-width: 280px;
-    }
-
-    .welcome-chips {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .welcome-chip {
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 20px;
-      font-size: 10px;
-      color: var(--text-dim);
-      padding: 5px 12px;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      transition: all .15s;
-    }
-
-    .welcome-chip:hover {
-      border-color: rgba(0,212,255,0.4);
-      color: var(--accent);
-      background: var(--accent-glow);
-    }
-
-    /* ── MENSAJES ───────────────────────────────────── */
-    .msg {
-      display: flex;
-      flex-direction: column;
-      animation: msgIn .35s cubic-bezier(0.16,1,0.3,1);
-    }
-
+    .msg { display: flex; flex-direction: column; width: 100%; animation: msgIn .3s ease; }
     .msg-user { align-items: flex-end; }
     .msg-ai { align-items: flex-start; }
+    .msg-header-ai { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .gemini-spark { width: 24px; height: 24px; background: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23a8c7fa%22%3E%3Cpath%20d%3D%22M12%2024C12%2017.3726%206.62742%2012%200%2012C6.62742%2012%2012%206.62742%2012%200C12%206.62742%2017.3726%2012%2024%2012C17.3726%2012%2012%2017.3726%2012%2024Z%22%2F%3E%3C%2Fsvg%3E') no-repeat center; background-size: contain; }
 
-    .msg-label {
-      font-size: 8.5px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      padding: 0 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .msg-bubble { font-size: 16px; line-height: 1.6; word-break: break-word; }
+    .msg-user .msg-bubble { background: var(--user-bubble); padding: 12px 20px; border-radius: 24px 24px 4px 24px; max-width: 85%; }
+    .msg-ai .msg-bubble { padding: 0 0 0 36px; width: 100%; }
 
-    .msg-user .msg-label { color: rgba(0,212,255,0.5); }
-    .msg-ai .msg-label { color: var(--text-muted); }
+    .stream-cursor { display: inline-block; width: 6px; height: 18px; background: var(--accent); border-radius: 3px; margin-left: 4px; vertical-align: middle; animation: blink 1s infinite; }
+    .typing-skeleton { width: 100%; height: 20px; background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 4px; margin-bottom: 8px; }
+    .typing-skeleton.short { width: 60%; }
 
-    .msg-label-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    /* ── CAJA DE TEXTO Y ARCHIVOS ─────────────────────────────────── */
+    #input-wrapper { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, var(--bg) 60%, transparent); padding: 12px 20px 24px; display: flex; flex-direction: column; align-items: center; }
+    .input-box { width: 100%; max-width: 800px; background: var(--surface); border-radius: 24px; display: flex; flex-direction: column; padding: 8px; }
+    .input-box:focus-within { background: var(--surface2); }
+    
+    #image-preview-bar { display: none; gap: 12px; padding: 8px 12px; overflow-x: auto; }
+    #image-preview-bar.has-images { display: flex; }
+    .img-preview-item { position: relative; width: 60px; height: 60px; border-radius: 12px; overflow: hidden; background: var(--bg); flex-shrink: 0; }
+    .img-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .doc-preview-badge { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 11px; font-weight: bold; color: var(--text-dim); background: var(--surface2); text-transform: uppercase; }
+    .img-remove-btn { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: rgba(0,0,0,0.6); border: none; color: white; cursor: pointer; display: none; align-items: center; justify-content: center; }
+    .img-preview-item:hover .img-remove-btn { display: flex; }
 
-    .msg-user .msg-label-dot { background: var(--accent); }
-    .msg-ai .msg-label-dot { background: var(--accent2); }
-
-    .msg-bubble {
-      max-width: 92%;
-      padding: 16px 20px;
-      border-radius: 3px;
-      font-size: 13px;
-      line-height: 1.9;
-      position: relative;
-      word-break: break-word;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-
-    .msg-user .msg-bubble {
-      background: var(--user-bubble);
-      border: 1px solid rgba(0,212,255,0.12);
-      border-right: 2px solid var(--accent);
-      border-radius: 3px 0 3px 3px;
-      font-family: 'DM Mono', monospace;
-    }
-
-    .msg-ai .msg-bubble {
-      background: var(--ai-bubble);
-      border: 1px solid var(--border);
-      border-left: 2px solid var(--accent2);
-      border-radius: 0 3px 3px 3px;
-    }
-
-    .msg-ai .msg-bubble::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, var(--accent2), transparent);
-      opacity: 0.3;
-    }
-
-    /* ── BOTONES DE ACCIÓN ── */
-    .msg-actions {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-      padding: 0 4px;
-    }
-
-    .action-btn {
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      color: var(--text-dim);
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      padding: 6px 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all .15s;
-      letter-spacing: 0.5px;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-
-    .action-btn:hover, .action-btn:active {
-      border-color: rgba(0,212,255,0.4);
-      color: var(--accent);
-      background: var(--accent-glow);
-    }
-
-    .action-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
-
-    /* ── TYPING ─────────────────────────────────────── */
-    .typing-indicator {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      padding: 14px 18px;
-      background: var(--ai-bubble);
-      border: 1px solid var(--border);
-      border-left: 2px solid var(--accent2);
-      border-radius: 0 3px 3px 3px;
-      width: fit-content;
-    }
-
-    .typing-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--accent2);
-      animation: typingBounce 1.4s infinite;
-    }
-
-    .typing-dot:nth-child(2) { animation-delay: .2s; }
-    .typing-dot:nth-child(3) { animation-delay: .4s; }
-
-    .stream-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 13px;
-      background: var(--accent);
-      margin-left: 2px;
-      vertical-align: middle;
-      animation: blink .9s infinite;
-    }
-
-    /* ── INPUT AREA ─────────────────────────────────── */
-    #input-area {
-      flex-shrink: 0;
-      background: rgba(6,8,16,0.92);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border);
-      padding: 14px 16px;
-      padding-bottom: calc(14px + env(safe-area-inset-bottom, 12px));
-      position: relative;
-      z-index: 10;
-    }
-
-    #input-area::before {
-      content: '';
-      position: absolute;
-      top: -1px; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.2), rgba(123,79,255,0.2), transparent);
-    }
-
-    /* ── FILA DE PREVIEW DE ARCHIVOS ── */
-    #image-preview-bar {
-      display: none;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    #image-preview-bar.has-images {
-      display: flex;
-    }
-
-    .img-preview-item {
-      position: relative;
-      width: 56px;
-      height: 56px;
-      border-radius: 4px;
-      overflow: hidden;
-      border: 1px solid var(--border2);
-      flex-shrink: 0;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .img-preview-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border-radius: 3px;
-    }
-
-    .doc-preview-badge {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 8px;
-      color: var(--accent);
-      text-transform: uppercase;
-      font-weight: bold;
-      text-align: center;
-      padding: 2px;
-      word-break: break-all;
-    }
-
-    .doc-preview-badge span {
-      font-size: 16px;
-      margin-bottom: 2px;
-    }
-
-    .img-loading-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(6,8,16,0.78);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      transition: opacity .35s ease;
-      z-index: 2;
-    }
-
-    .img-loading-overlay.done {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .img-spinner {
-      width: 22px;
-      height: 22px;
-      border: 2px solid rgba(0,212,255,0.15);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spinImg .75s linear infinite;
-    }
-
-    @keyframes spinImg {
-      to { transform: rotate(360deg); }
-    }
-
-    .img-remove-btn {
-      position: absolute;
-      top: 3px;
-      right: 3px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: rgba(6,8,16,0.85);
-      border: 1px solid var(--border2);
-      color: var(--text-dim);
-      font-size: 10px;
-      line-height: 16px;
-      text-align: center;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 3;
-      transition: all .15s;
-    }
-
-    .img-preview-item:hover .img-remove-btn {
-      display: flex;
-    }
-
-    .img-remove-btn:hover {
-      background: rgba(255,51,85,0.7);
-      border-color: var(--danger);
-      color: #fff;
-    }
-
-    /* ── FILA PRINCIPAL ── */
-    #input-main-row {
-      display: flex;
-      align-items: stretch;
-      gap: 8px;
-    }
-
-    #image-btn {
-      background: rgba(123,79,255,0.08);
-      border: 1px solid rgba(123,79,255,0.25);
-      border-radius: 3px;
-      color: rgba(123,79,255,0.8);
-      width: 46px;
-      min-width: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all .2s;
-      flex-shrink: 0;
-      align-self: stretch;
-    }
-
-    #image-btn:hover {
-      background: rgba(123,79,255,0.15);
-      border-color: var(--accent2);
-      color: var(--accent2);
-      box-shadow: 0 0 12px rgba(123,79,255,0.3);
-    }
-
-    #image-btn svg { width: 17px; height: 17px; }
-
+    .input-main-row { display: flex; align-items: flex-end; gap: 8px; padding: 4px; }
     #file-input { display: none; }
+    #user-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 16px; resize: none; max-height: 200px; padding: 12px 4px; margin-bottom: 2px; }
+    .btn-circle { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-dim); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+    .btn-circle:hover { background: var(--border); }
+    #send-btn:not(:disabled) { color: var(--text); background: var(--surface2); }
+    #send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    #send-btn {
-      background: linear-gradient(135deg, var(--accent) 0%, rgba(0,170,210,1) 100%);
-      border: none;
-      border-radius: 3px;
-      color: #000;
-      width: 46px;
-      min-width: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: box-shadow .2s, transform .1s, opacity .15s;
-      flex-shrink: 0;
-      align-self: stretch;
-    }
+    .footer-disclaimer { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 12px; }
 
-    #send-btn:hover:not(:disabled) {
-      box-shadow: 0 0 18px rgba(0,212,255,0.45);
-      transform: translateY(-1px);
-    }
+    /* ── ESTILOS MARKDOWN Y CÓDIGO (MARKED + HIGHLIGHT) ────────────────────────────── */
+    .msg-bubble p { margin-bottom: 12px; }
+    .msg-bubble ul, .msg-bubble ol { padding-left: 24px; margin-bottom: 12px; }
+    .msg-bubble li { margin-bottom: 6px; }
+    .msg-bubble h1, .msg-bubble h2, .msg-bubble h3 { margin: 24px 0 12px; font-weight: 500; }
+    .msg-bubble a { color: var(--accent); }
+    .msg-bubble table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .msg-bubble th, .msg-bubble td { padding: 10px; border: 1px solid var(--border2); text-align: left; }
+    .msg-bubble th { background: var(--surface2); }
+    
+    /* Código inline */
+    .msg-bubble code:not(.hljs) { font-family: 'Roboto Mono', monospace; background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+    
+    /* Bloques de código (Pre) */
+    .msg-bubble pre { background: #0d0d0e; padding: 16px; border-radius: 12px; overflow-x: auto; margin: 16px 0; border: 1px solid var(--border); }
+    .msg-bubble pre code { font-family: 'Roboto Mono', monospace; font-size: 14px; background: transparent; padding: 0; }
 
-    #send-btn:active:not(:disabled) { transform: translateY(0); }
-    #send-btn:disabled { opacity: .35; cursor: not-allowed; }
-    #send-btn svg { width: 14px; height: 14px; }
-
-    .input-wrapper {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      padding: 0 12px;
-      transition: border-color .2s, box-shadow .2s;
-      min-height: 46px;
-    }
-
-    .input-wrapper:focus-within {
-      border-color: rgba(0,212,255,0.35);
-      box-shadow: 0 0 0 3px rgba(0,212,255,0.06), 0 0 20px rgba(0,212,255,0.05);
-    }
-
-    #user-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      line-height: 1.55;
-      resize: none;
-      max-height: 120px;
-      overflow-y: auto;
-      -webkit-appearance: none;
-      padding: 0;
-      display: block;
-      vertical-align: middle;
-    }
-
-    #user-input::placeholder {
-      color: var(--text-muted);
-      line-height: 1.55;
-    }
-
-    #user-input::-webkit-scrollbar { width: 2px; }
-    #user-input::-webkit-scrollbar-thumb { background: var(--border); }
-
-    #stop-btn {
-      display: none;
-      background: rgba(255,51,85,0.08);
-      border: 1px solid rgba(255,51,85,0.3);
-      border-radius: 3px;
-      color: var(--danger);
-      font-family: 'DM Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 0 12px;
-      cursor: pointer;
-      transition: all .15s;
-      align-items: center;
-      gap: 5px;
-      flex-shrink: 0;
-      align-self: stretch;
-    }
-
-    #stop-btn:hover {
-      background: rgba(255,51,85,0.15);
-      border-color: var(--danger);
-    }
-
-    .input-footer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 8px;
-      padding: 0 2px;
-    }
-
-    .footer-disclaimer {
-      font-size: 8.5px;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      text-align: center;
-    }
-
-    .footer-disclaimer span { color: rgba(123,79,255,0.6); }
-
-    /* ── TOAST ──────────────────────────────────────── */
-    #copy-toast {
-      position: fixed;
-      bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-      left: 50%;
-      transform: translateX(-50%) translateY(14px);
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-top: 1px solid rgba(0,212,255,0.3);
-      color: var(--accent);
-      font-size: 9px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      padding: 9px 18px;
-      border-radius: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: all .25s cubic-bezier(0.16,1,0.3,1);
-      z-index: 999;
-      backdrop-filter: blur(10px);
-    }
-
-    #copy-toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* ── ANIMACIONES ────────────────────────────────── */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 6px var(--accent); } 50% { opacity: .4; box-shadow: 0 0 2px var(--accent); } }
-    @keyframes typingBounce { 0%,60%,100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-5px); opacity: 1; } }
     @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
-    @keyframes ringPulse { 0%,100% { opacity: .3; transform: scale(1); } 50% { opacity: .8; transform: scale(1.05); } }
-    @keyframes orbRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-    * { scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
-
-    /* ── MARKDOWN Y MATH ────────────────────────────── */
-    .msg-bubble code {
-      font-family: 'DM Mono', monospace;
-      background: rgba(0,212,255,0.07);
-      border: 1px solid rgba(0,212,255,0.12);
-      padding: 1px 6px;
-      border-radius: 2px;
-      font-size: 11.5px;
-      color: var(--accent);
-    }
-
-    .msg-bubble pre {
-      background: rgba(0,0,0,0.5);
-      border: 1px solid var(--border2);
-      border-left: 2px solid var(--accent2);
-      padding: 14px 16px;
-      border-radius: 3px;
-      overflow-x: auto;
-      margin: 10px 0;
-      font-size: 11.5px;
-    }
-
-    .msg-bubble pre code {
-      background: none;
-      border: none;
-      padding: 0;
-      color: var(--text);
-      font-size: inherit;
-    }
-
-    .msg-bubble p { margin-bottom: 10px; }
-    .msg-bubble p:last-child { margin-bottom: 0; }
-    .msg-bubble ul, .msg-bubble ol { padding-left: 20px; margin: 8px 0; }
-    .msg-bubble li { margin-bottom: 6px; line-height: 1.7; }
-    .msg-bubble strong { color: var(--accent); font-weight: 700; }
-    .msg-bubble em { color: rgba(200,180,255,0.95); font-style: italic; }
-
-    .msg-bubble h1, .msg-bubble h2, .msg-bubble h3, .msg-bubble h4 {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      color: var(--accent);
-      margin: 16px 0 8px;
-      line-height: 1.3;
-    }
-    .msg-bubble h1 { font-size: 18px; border-bottom: 1px solid rgba(0,212,255,0.2); padding-bottom: 6px; }
-    .msg-bubble h2 { font-size: 16px; }
-    .msg-bubble h3 { font-size: 14px; color: rgba(0,212,255,0.85); }
-    .msg-bubble h4 { font-size: 13px; color: rgba(123,79,255,0.9); }
-
-    .msg-bubble mjx-container {
-      color: var(--text);
-      max-width: 100%;
-      overflow-x: auto;
-    }
-
-    .msg-bubble mjx-container[display="true"] {
-      display: block;
-      text-align: center;
-      margin: 16px auto !important;
-      padding: 12px;
-      background: rgba(0,212,255,0.03);
-      border: 1px solid rgba(0,212,255,0.08);
-      border-radius: 4px;
-      overflow-x: auto;
-    }
-
-    .msg-bubble hr {
-      border: none;
-      border-top: 1px solid var(--border2);
-      margin: 14px 0;
-    }
-
-    .msg-bubble blockquote {
-      border-left: 3px solid var(--accent2);
-      padding: 6px 12px;
-      margin: 10px 0;
-      color: var(--text-dim);
-      font-style: italic;
-      background: rgba(123,79,255,0.05);
-      border-radius: 0 4px 4px 0;
-    }
-
-    .msg-bubble table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 12px 0;
-      font-size: 12px;
-    }
-
-    .msg-bubble th {
-      background: rgba(0,212,255,0.08);
-      color: var(--accent);
-      padding: 8px 12px;
-      text-align: left;
-      border: 1px solid var(--border2);
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-    }
-
-    .msg-bubble td {
-      padding: 7px 12px;
-      border: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .msg-bubble tr:nth-child(even) td {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .latex-error {
-      display: inline-block;
-      background: rgba(255,51,85,0.08);
-      border: 1px solid rgba(255,51,85,0.25);
-      border-radius: 3px;
-      color: var(--danger);
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      padding: 2px 8px;
-      margin: 2px 0;
-      opacity: 0.8;
-    }
-
-    .msg-images {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      max-width: 92%;
-      margin-bottom: 6px;
-      align-self: flex-end;
-    }
-
-    .msg-img-thumb {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 4px;
-      border: 1px solid rgba(0,212,255,0.15);
-      display: block;
-      cursor: pointer;
-    }
-
-    .msg-doc-thumb {
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 10px;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* ── LIGHTBOX ───────────────────────────────────── */
-    #lightbox {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      background: rgba(4,6,10,0.95);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    #lightbox.open {
-      display: flex;
-    }
-
-    #lightbox img {
-      max-width: 100%;
-      max-height: 90vh;
-      object-fit: contain;
-      border-radius: 4px;
-      border: 1px solid var(--border2);
-      box-shadow: 0 0 60px rgba(0,212,255,0.1);
-    }
-
-    #lightbox-close {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      background: var(--surface2);
-      border: 1px solid var(--border2);
-      border-radius: 50%;
-      color: var(--text-dim);
-      width: 34px;
-      height: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all .15s;
-    }
-
-    #lightbox-close:hover {
-      border-color: rgba(0,212,255,0.4);
-      color: var(--accent);
-    }
-
-    @media (max-width: 480px) {
-      .lang-grid { grid-template-columns: repeat(4, 1fr); }
-      .modal-box { padding: 32px 22px 28px; }
-      header { padding: 12px 16px; }
-      #messages { padding: 20px 14px 10px; }
-    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
   </style>
 </head>
 <body>
 
 <div id="api-modal">
   <div class="modal-box">
-    <div class="modal-logo">Silent <span>IA</span></div>
-    <div class="modal-sub">Acceso seguro requerido</div>
-    <div class="modal-divider"></div>
-
-    <div class="modal-label">Selecciona idioma por defecto</div>
-    <div class="lang-grid">
-      <button class="lang-btn selected" data-lang="es" data-prompt="Responde por defecto en español de forma precisa y clara. Sin embargo, si el usuario te solicita explícitamente responder en otro idioma (como inglés), responde en el idioma solicitado." onclick="selectLang(this)">
-        <span class="lang-flag">🇪🇸</span>
-        <span class="lang-name">Español</span>
-      </button>
-      <button class="lang-btn" data-lang="en" data-prompt="Always respond in English, unless requested otherwise." onclick="selectLang(this)">
-        <span class="lang-flag">🇺🇸</span>
-        <span class="lang-name">English</span>
-      </button>
-      <button class="lang-btn" data-lang="fr" data-prompt="Réponds par défaut en français." onclick="selectLang(this)">
-        <span class="lang-flag">🇫🇷</span>
-        <span class="lang-name">Français</span>
-      </button>
-      <button class="lang-btn" data-lang="pt" data-prompt="Responda por padrão em português." onclick="selectLang(this)">
-        <span class="lang-flag">🇧🇷</span>
-        <span class="lang-name">Português</span>
-      </button>
-      <button class="lang-btn" data-lang="de" data-prompt="Antworte standardmäßig auf Deutsch." onclick="selectLang(this)">
-        <span class="lang-flag">🇩🇪</span>
-        <span class="lang-name">Deutsch</span>
-      </button>
-      <button class="lang-btn" data-lang="it" data-prompt="Rispondi per impostazione predefinita in italiano." onclick="selectLang(this)">
-        <span class="lang-flag">🇮🇹</span>
-        <span class="lang-name">Italiano</span>
-      </button>
-      <button class="lang-btn" data-lang="ja" data-prompt="デフォルトで日本語で回答してください。" onclick="selectLang(this)">
-        <span class="lang-flag">🇯🇵</span>
-        <span class="lang-name">日本語</span>
-      </button>
-
-      <button class="lang-btn" data-lang="zh" data-prompt="默认用中文回答。" onclick="selectLang(this)">
-        <span class="lang-flag">🇨🇳</span>
-        <span class="lang-name">中文</span>
-      </button>
-      <button class="lang-btn" data-lang="ko" data-prompt="기본적으로 한국어로 대답하세요." onclick="selectLang(this)">
-        <span class="lang-flag">🇰🇷</span>
-        <span class="lang-name">한국어</span>
-      </button>
-      <button class="lang-btn" data-lang="ru" data-prompt="Отвечай по умолчанию на русском языке." onclick="selectLang(this)">
-        <span class="lang-flag">🇷🇺</span>
-        <span class="lang-name">Русский</span>
-      </button>
-      <button class="lang-btn" data-lang="ar" data-prompt="أجب بشكل افتراضي باللغة العربية." onclick="selectLang(this)">
-        <span class="lang-flag">🇸🇦</span>
-        <span class="lang-name">العربية</span>
-      </button>
-      <button class="lang-btn" data-lang="hi" data-prompt="डिफ़ॉल्ट रूप से हिंदी में जवाब दें।" onclick="selectLang(this)">
-        <span class="lang-flag">🇮🇳</span>
-        <span class="lang-name">हिन्दी</span>
-      </button>
-    </div>
-
-    <div class="modal-label">Tu API Key de Google Gemini</div>
+    <div class="modal-logo">Gemini Pro UI</div>
+    <div class="modal-label">API Key</div>
     <input type="password" id="api-key-input" class="modal-input" placeholder="AIzaSy..." autocomplete="off"/>
-    <div class="modal-error" id="api-error">API key inválida o error de conexión.</div>
-    <div class="modal-hint">Obtén tu key gratis en <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> — se guardará localmente.</div>
-    <button class="btn-primary" id="save-key-btn" onclick="saveApiKey()">Iniciar sesión →</button>
+    <div class="modal-error" id="api-error">API key inválida.</div>
+    <div class="modal-hint">Obtén tu key en <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>.</div>
+    <button class="btn-primary" id="save-key-btn" onclick="saveApiKey()">Acceder al Chat</button>
   </div>
 </div>
 
 <div id="app">
   <header>
-    <div class="header-brand">
-      <div class="logo-mark">
-        <div class="logo-ring"></div>
-        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="18,2 34,10 34,26 18,34 2,26 2,10" fill="none" stroke="#00d4ff" stroke-width="1" opacity=".35"/>
-          <polygon points="18,7 29,13 29,23 18,29 7,23 7,13" fill="none" stroke="#7b4fff" stroke-width="1" opacity=".5"/>
-          <polygon points="18,11 25,15 25,21 18,25 11,21 11,15" fill="none" stroke="#00d4ff" stroke-width="1" opacity=".3"/>
-          <circle cx="18" cy="18" r="3.5" fill="#00d4ff" opacity=".95"/>
-          <circle cx="18" cy="18" r="6" fill="none" stroke="#00d4ff" stroke-width=".5" opacity=".3"/>
-        </svg>
-      </div>
-      <div class="brand-text">
-        <div class="brand-name">Silent <span>IA</span></div>
-        <div class="brand-tagline">Powered by Gemini · gemini-2.5-pro</div>
-      </div>
-    </div>
+    <div class="header-brand">Gemini</div>
     <div class="header-right">
-      <div class="status-pill">
-        <div class="status-dot-live"></div>
-        Online
+      <div class="model-selector">
+        <select id="gemini-model" onchange="changeModel()">
+          <option value="gemini-1.5-flash">1.5 Flash (Rápido)</option>
+          <option value="gemini-1.5-pro">1.5 Pro (Inteligente)</option>
+          <option value="gemini-2.0-flash-exp">2.0 Flash Experimental</option>
+        </select>
       </div>
-      <button class="btn-reset" onclick="resetApiKey()">Key</button>
+      <button class="btn-icon" onclick="resetApiKey()" title="Cambiar API Key">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </button>
     </div>
   </header>
 
-  <div id="messages">
-    <div class="welcome">
-      <div class="welcome-orb">
-        <div class="welcome-orb-ring"></div>
-        <div class="welcome-orb-ring"></div>
-        <div class="welcome-orb-core">
-          <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
-            <circle cx="18" cy="18" r="5" fill="#00d4ff" opacity=".8"/>
-            <polygon points="18,4 32,12 32,24 18,32 4,24 4,12" fill="none" stroke="#00d4ff" stroke-width="1" opacity=".4"/>
-          </svg>
-        </div>
-      </div>
-      <h2>Bienvenido a <span>Silent IA</span></h2>
-      <p>Procesamiento avanzado de texto, código (Lua, Python), imágenes y documentos.<br/>¿En qué puedo ayudarte hoy?</p>
-      <div class="welcome-chips">
-        <div class="welcome-chip" onclick="useChip(this)">¿Qué puedes hacer?</div>
-        <div class="welcome-chip" onclick="useChip(this)">Revisa mi código en Lua</div>
-        <div class="welcome-chip" onclick="useChip(this)">Explícame un concepto</div>
-        <div class="welcome-chip" onclick="useChip(this)">Analiza este documento</div>
+  <div id="messages-container">
+    <div id="messages">
+      <div class="welcome">
+        <h2>Hola, soy Gemini</h2>
+        <p>¿En qué te puedo ayudar hoy?</p>
       </div>
     </div>
   </div>
 
-  <div id="input-area">
-    <div id="image-preview-bar"></div>
-    <input type="file" id="file-input" accept="image/*,application/pdf,text/*,.txt,.lua,.py,.js,.html,.css,.json,.md,.csv" multiple/>
-    <div id="input-main-row">
-      <button id="image-btn" onclick="triggerFileUpload()" title="Adjuntar archivo (imágenes, PDFs, scripts Lua, etc.)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-        </svg>
-      </button>
-      <div class="input-wrapper">
-        <textarea id="user-input" placeholder="Escribe tu mensaje..." rows="1"></textarea>
+  <div id="input-wrapper">
+    <div class="input-box">
+      <div id="image-preview-bar"></div>
+      <div class="input-main-row">
+        <!-- Input para múltiples archivos. Acepta imágenes, pdfs, texto, código, etc. -->
+        <input type="file" id="file-input" accept="image/*,application/pdf,text/*,.py,.js,.lua,.html,.json" multiple/>
+        <button class="btn-circle" onclick="triggerFileUpload()" title="Adjuntar archivo o imagen">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <textarea id="user-input" placeholder="Escribe tu consulta o pide que analice el archivo adjunto" rows="1"></textarea>
+        <button id="send-btn" class="btn-circle" onclick="sendMessage()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
+        <button id="stop-btn" class="btn-circle" onclick="stopGeneration()" style="display:none; color: var(--danger);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        </button>
       </div>
-      <button id="stop-btn" onclick="stopGeneration()">
-        <svg viewBox="0 0 12 12" fill="currentColor" width="10" height="10"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5"/></svg>
-        Stop
-      </button>
-      <button id="send-btn" onclick="sendMessage()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-      </button>
     </div>
-    <div class="input-footer">
-      <div class="footer-disclaimer"><span>Silent IA</span> puede cometer errores. Verifica información importante.</div>
-    </div>
+    <div class="footer-disclaimer">Gemini puede mostrar información imprecisa. Revisa las respuestas importantes.</div>
   </div>
-</div>
-
-<div id="copy-toast">✓ Copiado</div>
-
-<div id="lightbox">
-  <button id="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="lightbox-img" src="" alt="Imagen ampliada"/>
 </div>
 
 <script>
-  // ── Estado ──────────────────────────────────────────────
-  let apiKey = localStorage.getItem('silent_gemini_key') || '';
-  let messages = []; // Formato interno
+  // Configuración de Marked.js con Highlight.js para dar color al código
+  marked.setOptions({
+    highlight: function(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    },
+    langPrefix: 'hljs language-'
+  });
+
+  let apiKey = localStorage.getItem('gemini_custom_key') || '';
+  let messages = [];
   let abortController = null;
   let isGenerating = false;
-  let selectedLangPrompt = localStorage.getItem('silent_lang_prompt') || 'Responde por defecto en español de forma precisa y clara. Sin embargo, si el usuario te solicita explícitamente responder en otro idioma (como inglés), responde en el idioma solicitado.';
-  let selectedLangCode = localStorage.getItem('silent_lang_code') || 'es';
+  let currentModel = 'gemini-1.5-flash';
 
-  // ── Modelo Gemini 2.5 Pro ──────────────────────────────────
-  const GEMINI_MODEL = 'gemini-2.5-pro';
+  const SYSTEM_PROMPT = `Eres un experto asistente de IA (Google Gemini). Habla en español. 
+Si el usuario te envía archivos o imágenes de código, analízalos meticulosamente. 
+Siempre que devuelvas código, usa bloques de Markdown especificando el lenguaje (ejemplo: \`\`\`python).`;
 
   let pendingFiles = [];
   let filesLoadingCount = 0;
-  let userScrolledUp = false;
-
-  const messagesEl = document.getElementById('messages');
-
-  messagesEl.addEventListener('scroll', () => {
-    const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight;
-    userScrolledUp = distanceFromBottom > 80;
-  });
-
-  function scrollToBottom(force = false) {
-    if (force || !userScrolledUp) {
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-  }
-
-  const BASE_SYSTEM_PROMPT = `Eres Silent IA, un asistente avanzado y directo. Formato:
-- Markdown: **negrita**, *cursiva*, # títulos, listas con -, código con triple backtick.
-- Matemáticas: LaTeX inline $formula$, bloque $$formula$$.
-- LaTeX: \\left( y \\right) al mismo nivel. Cada paso en bloque $$...$$. Sin saltos dentro de $$.
-- Problemas: **Datos:** **Fórmula:** **Desarrollo:** **Resultado:**
-- Secciones: ## y ###. Pasos numerados.`;
 
   window.onload = () => {
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.classList.remove('selected');
-      if (btn.dataset.lang === selectedLangCode) btn.classList.add('selected');
-    });
     if (apiKey) showApp();
     initTextarea();
-    initFileInput();
+    document.getElementById('file-input').addEventListener('change', handleFiles);
   };
 
-  function setDynamicHeight() {
-    const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    document.getElementById('app').style.height = vh + 'px';
+  function changeModel() {
+    currentModel = document.getElementById('gemini-model').value;
   }
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => { setDynamicHeight(); });
-    window.visualViewport.addEventListener('scroll', setDynamicHeight);
-  }
-  window.addEventListener('resize', setDynamicHeight);
 
   function showApp() {
     document.getElementById('api-modal').style.display = 'none';
-    const app = document.getElementById('app');
-    app.style.display = 'flex';
-    setDynamicHeight();
+    document.getElementById('app').style.display = 'flex';
     setTimeout(() => document.getElementById('user-input').focus(), 100);
   }
 
@@ -1403,317 +256,151 @@
     const ta = document.getElementById('user-input');
     ta.addEventListener('input', () => {
       ta.style.height = 'auto';
-      ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+      ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
     });
     ta.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (!isGenerating) sendMessage();
-      }
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!isGenerating) sendMessage(); }
     });
-  }
-
-  function useChip(el) {
-    document.getElementById('user-input').value = el.textContent;
-    sendMessage();
-  }
-
-  function selectLang(btn) {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    selectedLangPrompt = btn.dataset.prompt;
-    selectedLangCode = btn.dataset.lang;
-    localStorage.setItem('silent_lang_prompt', selectedLangPrompt);
-    localStorage.setItem('silent_lang_code', selectedLangCode);
   }
 
   async function saveApiKey() {
     const input = document.getElementById('api-key-input');
     const key = input.value.trim();
-    const errorEl = document.getElementById('api-error');
-    const btn = document.getElementById('save-key-btn');
-
-    if (!key) {
-      errorEl.style.display = 'block';
-      errorEl.textContent = 'Por favor ingresa una API Key.';
-      return;
-    }
-
-    btn.textContent = 'Verificando...';
-    btn.disabled = true;
-    errorEl.style.display = 'none';
-
+    if (!key) return;
+    document.getElementById('save-key-btn').textContent = 'Comprobando...';
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}?key=${key}`);
-
-      if (res.ok) {
-        apiKey = key;
-        localStorage.setItem('silent_gemini_key', key);
-        showApp();
-      } else {
-        const err = await res.json();
-        errorEl.textContent = err.error?.message || 'API key inválida.';
-        errorEl.style.display = 'block';
-      }
-    } catch {
-      errorEl.textContent = 'Error de red. Verifica tu conexión.';
-      errorEl.style.display = 'block';
-    }
-
-    btn.textContent = 'Iniciar sesión →';
-    btn.disabled = false;
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key=${key}`);
+      if (res.ok) { apiKey = key; localStorage.setItem('gemini_custom_key', key); showApp(); } 
+      else { document.getElementById('api-error').style.display = 'block'; }
+    } catch { document.getElementById('api-error').style.display = 'block'; }
+    document.getElementById('save-key-btn').textContent = 'Acceder al Chat';
   }
 
   function resetApiKey() {
-    if (confirm('¿Cambiar la API key?')) {
-      localStorage.removeItem('silent_gemini_key');
-      apiKey = '';
-      messages = [];
-      document.getElementById('api-modal').style.display = 'flex';
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('api-key-input').value = '';
-    }
+    localStorage.removeItem('gemini_custom_key'); location.reload();
   }
 
-  function initFileInput() {
-    const fileInput = document.getElementById('file-input');
-    fileInput.addEventListener('change', handleFiles);
-  }
+  function triggerFileUpload() { document.getElementById('file-input').click(); }
 
-  function triggerFileUpload() {
-    if (pendingFiles.length >= 5) return;
-    document.getElementById('file-input').click();
-  }
-
+  // Procesamiento de Archivos e Imágenes a Base64
   function handleFiles(e) {
-    const files = Array.from(e.target.files);
-    e.target.value = '';
-
-    const slots = 5 - pendingFiles.length;
-    const toAdd = files.slice(0, slots);
-
-    toAdd.forEach(file => {
+    Array.from(e.target.files).forEach(file => {
       const isImage = file.type.startsWith('image/');
-      const previewUrl = isImage ? URL.createObjectURL(file) : null;
-      const entry = { file, base64: null, mimeType: file.type || 'text/plain', name: file.name, isImage, ready: false, previewUrl };
+      let ext = file.name.split('.').pop().toUpperCase();
+      const entry = { file, base64: null, mimeType: file.type || 'text/plain', name: file.name, isImage, ext, ready: false };
+      
+      if (isImage) entry.previewUrl = URL.createObjectURL(file);
       pendingFiles.push(entry);
-      addFilePreviewItem(entry);
-      readFileData(entry);
+      filesLoadingCount++;
+      updateSendState();
+      
+      const reader = new FileReader();
+      reader.onload = ev => {
+        entry.base64 = ev.target.result.split(',')[1];
+        entry.ready = true;
+        filesLoadingCount--;
+        updateSendState();
+        renderPreviews();
+      };
+      reader.readAsDataURL(file);
     });
-
-    refreshFilePreviewBar();
+    e.target.value = '';
+    renderPreviews();
   }
 
-  function readFileData(entry) {
-    filesLoadingCount++;
-    updateSendButtonState();
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target.result;
-      entry.base64 = dataUrl.split(',')[1];
-      entry.ready = true;
-      filesLoadingCount--;
-
-      const overlay = entry._overlayEl;
-      if (overlay) {
-        overlay.classList.add('done');
-        setTimeout(() => overlay.remove(), 350);
-      }
-
-      updateSendButtonState();
-    };
-    reader.readAsDataURL(entry.file);
-  }
-
-  function addFilePreviewItem(entry) {
-    const bar = document.getElementById('image-preview-bar');
-
-    const item = document.createElement('div');
-    item.className = 'img-preview-item';
-
-    if (entry.isImage) {
-      const img = document.createElement('img');
-      img.src = entry.previewUrl;
-      img.alt = 'Imagen adjunta';
-      item.appendChild(img);
-    } else {
-      const ext = entry.name.split('.').pop().toUpperCase();
-      const badge = document.createElement('div');
-      badge.className = 'doc-preview-badge';
-      badge.innerHTML = `<span>📄</span>${ext.slice(0, 4)}`;
-      item.appendChild(badge);
-    }
-
-    const overlay = document.createElement('div');
-    overlay.className = 'img-loading-overlay';
-    const spinner = document.createElement('div');
-    spinner.className = 'img-spinner';
-    overlay.appendChild(spinner);
-
-    entry._overlayEl = overlay;
-    entry._itemEl = item;
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'img-remove-btn';
-    removeBtn.innerHTML = '✕';
-    removeBtn.title = 'Quitar archivo';
-    removeBtn.addEventListener('click', () => removeFile(entry));
-
-    item.appendChild(overlay);
-    item.appendChild(removeBtn);
-
-    bar.appendChild(item);
-  }
-
-  function removeFile(entry) {
-    if (entry._itemEl) entry._itemEl.remove();
-    if (!entry.ready) filesLoadingCount = Math.max(0, filesLoadingCount - 1);
-    if (entry.previewUrl) URL.revokeObjectURL(entry.previewUrl);
-    pendingFiles = pendingFiles.filter(e => e !== entry);
-    refreshFilePreviewBar();
-    updateSendButtonState();
-  }
-
-  function refreshFilePreviewBar() {
-    const bar = document.getElementById('image-preview-bar');
-    if (pendingFiles.length > 0) {
-      bar.classList.add('has-images');
-    } else {
-      bar.classList.remove('has-images');
-    }
-  }
-
-  function updateSendButtonState() {
-    const sendBtn = document.getElementById('send-btn');
-    if (filesLoadingCount > 0 || isGenerating) {
-      sendBtn.disabled = true;
-    } else {
-      sendBtn.disabled = false;
-    }
-  }
-
-  function clearPendingFiles() {
-    pendingFiles.forEach(e => { if (e.previewUrl) URL.revokeObjectURL(e.previewUrl); });
-    pendingFiles = [];
-    filesLoadingCount = 0;
+  function renderPreviews() {
     const bar = document.getElementById('image-preview-bar');
     bar.innerHTML = '';
-    bar.classList.remove('has-images');
+    bar.classList.toggle('has-images', pendingFiles.length > 0);
+    pendingFiles.forEach((file, idx) => {
+      const div = document.createElement('div');
+      div.className = 'img-preview-item';
+      if (file.isImage) {
+        div.innerHTML = `<img src="${file.previewUrl}"><button class="img-remove-btn" onclick="removeFile(${idx})">✕</button>`;
+      } else {
+        div.innerHTML = `<div class="doc-preview-badge">${file.ext}</div><button class="img-remove-btn" onclick="removeFile(${idx})">✕</button>`;
+      }
+      bar.appendChild(div);
+    });
   }
 
-  function updateRegenButtons() {
-    const allRegenBtns = messagesEl.querySelectorAll('.regen-btn');
-    allRegenBtns.forEach(btn => btn.style.display = 'none');
-    if (allRegenBtns.length > 0) {
-      allRegenBtns[allRegenBtns.length - 1].style.display = 'flex';
-    }
+  function removeFile(idx) {
+    if (pendingFiles[idx].previewUrl) URL.revokeObjectURL(pendingFiles[idx].previewUrl);
+    pendingFiles.splice(idx, 1);
+    renderPreviews();
   }
 
-  // Convierte el historial local al formato nativo de Gemini
-  function buildGeminiContents(history) {
-    return history.map(msg => {
+  function updateSendState() {
+    document.getElementById('send-btn').disabled = (filesLoadingCount > 0 || isGenerating);
+  }
+
+  // Construye la estructura exacta que pide la API de Google
+  function buildGeminiContents() {
+    return messages.map(msg => {
       const role = msg.role === 'assistant' ? 'model' : 'user';
       let parts = [];
-
       if (Array.isArray(msg.content)) {
         msg.content.forEach(c => {
           if (c.type === 'file') {
-            parts.push({
-              inline_data: {
-                mime_type: c.mimeType,
-                data: c.base64
-              }
-            });
-          } else if (c.type === 'text') {
+            parts.push({ inlineData: { mimeType: c.mimeType, data: c.base64 } });
+          } else {
             parts.push({ text: c.text });
           }
         });
       } else {
         parts.push({ text: msg.content });
       }
-
       return { role, parts };
     });
+  }
+
+  function scrollToBottom() {
+    const container = document.getElementById('messages-container');
+    container.scrollTop = container.scrollHeight;
   }
 
   async function sendMessage() {
     const input = document.getElementById('user-input');
     const text = input.value.trim();
-    const hasFiles = pendingFiles.length > 0;
+    if (!text && pendingFiles.length === 0) return;
 
-    if ((!text && !hasFiles) || isGenerating) return;
-    if (filesLoadingCount > 0) return;
+    document.querySelector('.welcome')?.remove();
 
-    const welcome = document.querySelector('.welcome');
-    if (welcome) welcome.remove();
-
-    const filesToSend = pendingFiles.filter(e => e.ready);
-
-    let userContentPayload;
-    if (filesToSend.length > 0) {
-      userContentPayload = [];
-      filesToSend.forEach(entry => {
-        userContentPayload.push({
-          type: 'file',
-          mimeType: entry.mimeType,
-          base64: entry.base64,
-          name: entry.name,
-          isImage: entry.isImage,
-          previewUrl: entry.previewUrl
-        });
-      });
-      if (text) {
-        userContentPayload.push({ type: 'text', text: text });
-      } else {
-        userContentPayload.push({ type: 'text', text: 'Analiza el contenido del archivo adjunto.' });
-      }
-    } else {
-      userContentPayload = text;
+    let userPayload = text;
+    if (pendingFiles.length > 0) {
+      userPayload = pendingFiles.filter(f => f.ready).map(f => ({ type: 'file', mimeType: f.mimeType, base64: f.base64 }));
+      userPayload.push({ type: 'text', text: text || 'Revisa este archivo.' });
     }
 
-    messages.push({ role: 'user', content: userContentPayload });
-    appendUserMessage(text, filesToSend);
-
+    messages.push({ role: 'user', content: userPayload });
+    appendUserMsg(text, pendingFiles);
+    
     input.value = '';
     input.style.height = 'auto';
-    clearPendingFiles();
+    pendingFiles = [];
+    renderPreviews();
+    
+    isGenerating = true; updateSendState();
+    document.getElementById('send-btn').style.display = 'none';
+    document.getElementById('stop-btn').style.display = 'flex';
 
-    userScrolledUp = false;
-    scrollToBottom(true);
-
-    setGenerating(true);
-    const typingEl = appendTypingIndicator();
     abortController = new AbortController();
-
-    const contentsForGemini = buildGeminiContents(messages);
-
-    const payload = {
-      system_instruction: {
-        parts: [{ text: BASE_SYSTEM_PROMPT + '\n\n' + selectedLangPrompt }]
-      },
-      contents: contentsForGemini
-    };
+    const typingUI = appendTypingMsg();
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`, {
-        method: 'POST',
-        signal: abortController.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:streamGenerateContent?alt=sse&key=${apiKey}`, {
+        method: 'POST', signal: abortController.signal, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: buildGeminiContents()
+        })
       });
 
-      if (!response.ok) {
-        const err = await response.json();
-        typingEl.remove();
-        appendAiMessage('⚠ Error: ' + (err.error?.message || 'Error desconocido al conectar con Gemini.'));
-        setGenerating(false);
-        return;
-      }
+      typingUI.remove();
+      if (!res.ok) throw new Error('API Error');
 
-      typingEl.remove();
-      const { msgEl, bubbleEl, contentEl, cursorEl } = appendAiMessageStreaming();
-      const reader = response.body.getReader();
+      const { contentEl, cursor } = appendStreamingMsg();
+      const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let fullText = '';
 
@@ -1721,525 +408,73 @@
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
+        chunk.split('\n').forEach(line => {
           if (line.startsWith('data: ')) {
-            const dataStr = line.slice(6).trim();
-            if (!dataStr) continue;
             try {
-              const json = JSON.parse(dataStr);
-              const textPart = json.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (textPart) {
-                fullText += textPart;
-                contentEl.textContent = fullText;
-                contentEl.appendChild(cursorEl);
-                scrollToBottom();
+              const textPart = JSON.parse(line.slice(6)).candidates?.[0]?.content?.parts?.[0]?.text;
+              if (textPart) { 
+                fullText += textPart; 
+                // Renderizado en vivo con Marked
+                contentEl.innerHTML = marked.parse(fullText) + '<span class="stream-cursor"></span>';
+                scrollToBottom(); 
               }
-            } catch (e) {}
+            } catch {}
           }
-        }
+        });
       }
-
-      cursorEl.remove();
-      contentEl.innerHTML = formatMarkdown(fullText);
+      // Renderizado final sin cursor
+      contentEl.innerHTML = marked.parse(fullText);
       messages.push({ role: 'assistant', content: fullText });
-
-      addMessageActions(msgEl, fullText);
-      updateRegenButtons();
-
-      renderMath(contentEl, () => { scrollToBottom(true); });
+      
+      // Aplicar LaTeX si hay matemáticas
+      if (window.MathJax) window.MathJax.typesetPromise([contentEl]);
 
     } catch (err) {
-      typingEl?.remove();
-      if (err.name !== 'AbortError') {
-        appendAiMessage('⚠ Error de conexión: ' + err.message);
-      }
+      if(typingUI) typingUI.remove();
+      if (err.name !== 'AbortError') appendAIMsg('Ha ocurrido un error. Asegúrate de que el modelo soporte los archivos enviados.');
     }
 
-    setGenerating(false);
+    isGenerating = false; updateSendState();
+    document.getElementById('send-btn').style.display = 'flex';
+    document.getElementById('stop-btn').style.display = 'none';
+    scrollToBottom();
   }
 
   function stopGeneration() {
-    if (abortController) { abortController.abort(); abortController = null; }
-    setGenerating(false);
+    if (abortController) abortController.abort();
+    isGenerating = false;
   }
 
-  function setGenerating(val) {
-    isGenerating = val;
-    updateSendButtonState();
-    document.getElementById('stop-btn').style.display = val ? 'flex' : 'none';
+  function appendUserMsg(text, files) {
+    const div = document.createElement('div'); div.className = 'msg msg-user';
+    let content = '';
+    if (files.length) content += `<div style="display:flex;gap:8px;margin-bottom:8px">` + files.map(f => f.isImage ? `<img src="${f.previewUrl}" style="height:60px;border-radius:8px">` : `<div style="background:var(--surface2);padding:8px 12px;border-radius:8px;font-size:12px;font-weight:bold;color:var(--text-dim)">📄 Archivo ${f.ext}</div>`).join('') + `</div>`;
+    if (text) content += `<div>${text.replace(/\n/g, '<br>')}</div>`;
+    div.innerHTML = `<div class="msg-bubble">${content}</div>`;
+    document.getElementById('messages').appendChild(div);
+    scrollToBottom();
   }
 
-  function appendUserMessage(text, files) {
-    const msgEl = document.createElement('div');
-    msgEl.className = 'msg msg-user';
-
-    const labelEl = document.createElement('div');
-    labelEl.className = 'msg-label';
-    labelEl.innerHTML = '<span class="msg-label-dot"></span>Tú';
-    msgEl.appendChild(labelEl);
-
-    if (files && files.length > 0) {
-      const filesRow = document.createElement('div');
-      filesRow.className = 'msg-images';
-      files.forEach(entry => {
-        if (entry.isImage) {
-          const imgEl = document.createElement('img');
-          imgEl.className = 'msg-img-thumb';
-          imgEl.src = entry.previewUrl;
-          imgEl.alt = 'Imagen adjunta';
-          imgEl.addEventListener('click', () => openLightbox(entry.previewUrl));
-          filesRow.appendChild(imgEl);
-        } else {
-          const docEl = document.createElement('div');
-          docEl.className = 'msg-doc-thumb';
-          docEl.innerHTML = `📄 ${entry.name}`;
-          filesRow.appendChild(docEl);
-        }
-      });
-      msgEl.appendChild(filesRow);
-    }
-
-    if (text) {
-      const bubble = document.createElement('div');
-      bubble.className = 'msg-bubble';
-      bubble.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
-      msgEl.appendChild(bubble);
-    }
-
-    messagesEl.appendChild(msgEl);
-    scrollToBottom(true);
+  function appendTypingMsg() {
+    const div = document.createElement('div'); div.className = 'msg msg-ai';
+    div.innerHTML = `<div class="msg-header-ai"><div class="gemini-spark"></div></div><div class="msg-bubble"><div class="typing-skeleton"></div><div class="typing-skeleton short"></div></div>`;
+    document.getElementById('messages').appendChild(div); scrollToBottom(); return div;
   }
 
-  function appendTypingIndicator() {
-    const msgEl = document.createElement('div');
-    msgEl.className = 'msg msg-ai';
-    msgEl.innerHTML = `
-      <div class="msg-label"><span class="msg-label-dot"></span>Silent IA</div>
-      <div class="typing-indicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-      </div>
-    `;
-    messagesEl.appendChild(msgEl);
-    scrollToBottom(true);
-    return msgEl;
+  function appendStreamingMsg() {
+    const div = document.createElement('div'); div.className = 'msg msg-ai';
+    const bubble = document.createElement('div'); bubble.className = 'msg-bubble';
+    const content = document.createElement('div');
+    div.innerHTML = `<div class="msg-header-ai"><div class="gemini-spark"></div></div>`;
+    bubble.appendChild(content); div.appendChild(bubble); document.getElementById('messages').appendChild(div);
+    scrollToBottom(); return { contentEl: content };
   }
 
-  function appendAiMessageStreaming() {
-    const msgEl = document.createElement('div');
-    msgEl.className = 'msg msg-ai';
-
-    const bubbleEl = document.createElement('div');
-    bubbleEl.className = 'msg-bubble';
-    bubbleEl.style.fontFamily = "'DM Mono', monospace";
-    bubbleEl.style.whiteSpace = 'pre-wrap';
-
-    const contentEl = document.createElement('div');
-    const cursorEl = document.createElement('span');
-    cursorEl.className = 'stream-cursor';
-
-    bubbleEl.appendChild(contentEl);
-    bubbleEl.appendChild(cursorEl);
-
-    msgEl.innerHTML = '<div class="msg-label"><span class="msg-label-dot"></span>Silent IA</div>';
-    msgEl.appendChild(bubbleEl);
-
-    messagesEl.appendChild(msgEl);
-    scrollToBottom(true);
-    return { msgEl, bubbleEl, contentEl, cursorEl };
+  function appendAIMsg(text) {
+    const div = document.createElement('div'); div.className = 'msg msg-ai';
+    div.innerHTML = `<div class="msg-header-ai"><div class="gemini-spark"></div></div><div class="msg-bubble">${marked.parse(text)}</div>`;
+    document.getElementById('messages').appendChild(div); scrollToBottom();
   }
-
-  function appendAiMessage(text) {
-    const msgEl = document.createElement('div');
-    msgEl.className = 'msg msg-ai';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'msg-bubble';
-    bubble.innerHTML = formatMarkdown(text);
-
-    msgEl.innerHTML = '<div class="msg-label"><span class="msg-label-dot"></span>Silent IA</div>';
-    msgEl.appendChild(bubble);
-    addMessageActions(msgEl, text);
-    updateRegenButtons();
-    messagesEl.appendChild(msgEl);
-
-    renderMath(bubble, () => scrollToBottom(true));
-  }
-
-  function addMessageActions(msgEl, text) {
-    const actionsEl = document.createElement('div');
-    actionsEl.className = 'msg-actions';
-
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'action-btn';
-    copyBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="9" y="9" width="13" height="13" rx="2"/>
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-      </svg>
-      Copiar
-    `;
-    copyBtn.addEventListener('click', () => copyText(text, copyBtn));
-
-    const regenBtn = document.createElement('button');
-    regenBtn.className = 'action-btn regen-btn';
-    regenBtn.style.display = 'none';
-    regenBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M23 4v6h-6"/>
-        <path d="M1 20v-6h6"/>
-        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-      </svg>
-      Regenerar
-    `;
-    regenBtn.addEventListener('click', () => regenerate(msgEl));
-
-    actionsEl.appendChild(copyBtn);
-    actionsEl.appendChild(regenBtn);
-    msgEl.appendChild(actionsEl);
-  }
-
-  function copyText(text, btn) {
-    const originalHTML = btn.innerHTML;
-
-    const doSuccess = () => {
-      btn.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-        ¡Copiado!
-      `;
-      btn.style.color = 'var(--accent)';
-      btn.style.borderColor = 'rgba(0,212,255,0.4)';
-      const toast = document.getElementById('copy-toast');
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-        btn.innerHTML = originalHTML;
-        btn.style.color = '';
-        btn.style.borderColor = '';
-      }, 2000);
-    };
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(doSuccess).catch(() => { fallbackCopy(text, doSuccess); });
-    } else {
-      fallbackCopy(text, doSuccess);
-    }
-  }
-
-  function fallbackCopy(text, onSuccess) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.top = '-9999px';
-    ta.style.left = '-9999px';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.focus();
-    ta.select();
-    try {
-      document.execCommand('copy');
-      onSuccess();
-    } catch (e) {
-      console.warn('No se pudo copiar:', e);
-    }
-    document.body.removeChild(ta);
-  }
-
-  async function regenerate(msgEl) {
-    if (isGenerating) return;
-
-    if (messages[messages.length - 1]?.role === 'assistant') messages.pop();
-    msgEl.remove();
-
-    userScrolledUp = false;
-    setGenerating(true);
-    const typingEl = appendTypingIndicator();
-    abortController = new AbortController();
-
-    const contentsForGemini = buildGeminiContents(messages);
-
-    const payload = {
-      system_instruction: {
-        parts: [{ text: BASE_SYSTEM_PROMPT + '\n\n' + selectedLangPrompt + '\n\nIMPORTANTE: Revisa tu respuesta anterior, corrige posibles imprecisiones y proporciona una versión mejorada.' }]
-      },
-      contents: contentsForGemini
-    };
-
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`, {
-        method: 'POST',
-        signal: abortController.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      typingEl.remove();
-      const { msgEl: newMsgEl, bubbleEl, contentEl, cursorEl } = appendAiMessageStreaming();
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const dataStr = line.slice(6).trim();
-            if (!dataStr) continue;
-            try {
-              const json = JSON.parse(dataStr);
-              const textPart = json.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (textPart) {
-                fullText += textPart;
-                contentEl.textContent = fullText;
-                contentEl.appendChild(cursorEl);
-                scrollToBottom();
-              }
-            } catch (e) {}
-          }
-        }
-      }
-
-      cursorEl.remove();
-      contentEl.innerHTML = formatMarkdown(fullText);
-      messages.push({ role: 'assistant', content: fullText });
-      addMessageActions(newMsgEl, fullText);
-      updateRegenButtons();
-
-      renderMath(contentEl, () => scrollToBottom(true));
-
-    } catch (err) {
-      typingEl?.remove();
-    }
-
-    setGenerating(false);
-  }
-
-  function openLightbox(src) {
-    const lb = document.getElementById('lightbox');
-    const lbImg = document.getElementById('lightbox-img');
-    lbImg.src = src;
-    lb.classList.add('open');
-  }
-
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('open');
-  }
-
-  document.getElementById('lightbox').addEventListener('click', function(e) {
-    if (e.target === this) closeLightbox();
-  });
-
-  function sanitizeLaTeX(latex) {
-    let s = latex;
-    let prev = '';
-    let iter = 0;
-    while (prev !== s && iter < 10) {
-      prev = s;
-      s = s.replace(/\\right([.)\]])\s*\}/g, (match, delim, offset, full) => {
-        const before = full.slice(0, offset);
-        const nLeft  = (before.match(/\\left[\s\S]/g)  || []).length;
-        const nRight = (before.match(/\\right[\s\S]/g) || []).length;
-        if (nLeft > nRight) return match;
-        return '}\\right' + delim;
-      });
-      iter++;
-    }
-
-    const lp = (s.match(/\\left\(/g)  || []).length;
-    const rp = (s.match(/\\right\)/g) || []).length;
-    if (lp > rp) s += '\\right.'.repeat(lp - rp);
-
-    const lb = (s.match(/\\left\[/g)  || []).length;
-    const rb = (s.match(/\\right\]/g) || []).length;
-    if (lb > rb) s += '\\right.'.repeat(lb - rb);
-
-    s = s.replace(/\\left\s+\(/g, '\\left(');
-    s = s.replace(/\\left\s+\[/g, '\\left[');
-    s = s.replace(/\\right\s+\)/g, '\\right)');
-    s = s.replace(/\\right\s+\]/g, '\\right]');
-
-    return s;
-  }
-
-  function autoWrapLaTeX(text) {
-    return text.split('\n').map(line => {
-      const trimmed = line.trim();
-      if (!trimmed) return line;
-      if (trimmed.includes('$') || trimmed.includes('\\[') || trimmed.includes('\\(')) return line;
-      if (/^<[a-zA-Z]/.test(trimmed)) return line;
-      if (/^(#{1,6}\s|[-*+]\s|>\s|\d+\.\s)/.test(trimmed)) return line;
-      if (/^\\[a-zA-Z]/.test(trimmed)) {
-        return '$$' + trimmed + '$$';
-      }
-      return line;
-    }).join('\n');
-  }
-
-  function renderMath(el, callback) {
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      const bubble = el.closest ? el.closest('.msg-bubble') : el;
-      if (bubble) {
-        bubble.style.fontFamily = '';
-        bubble.style.whiteSpace = '';
-      }
-      window.MathJax.typesetPromise([el])
-        .then(() => {
-          el.querySelectorAll('mjx-merror').forEach(errEl => {
-            const container = errEl.closest('mjx-container');
-            const span = document.createElement('span');
-            span.className = 'latex-error';
-            span.title = 'Fórmula LaTeX con error de sintaxis';
-            span.textContent = '⚠ error en fórmula';
-            if (container) container.replaceWith(span);
-            else errEl.replaceWith(span);
-          });
-          if (callback) callback();
-        })
-        .catch(err => {
-          console.warn('MathJax render error:', err);
-          if (callback) callback();
-        });
-    } else {
-      setTimeout(() => renderMath(el, callback), 500);
-    }
-  }
-
-  function formatMarkdown(raw) {
-    const mathStore = [];
-
-    function saveMath(str) {
-      let content, openDel, closeDel;
-
-      if (str.startsWith('$$') && str.endsWith('$$') && str.length > 4) {
-        content = str.slice(2, -2);
-        openDel = '$$'; closeDel = '$$';
-      } else if (str.startsWith('$') && str.endsWith('$') && str.length > 2) {
-        content = str.slice(1, -1);
-        openDel = '$'; closeDel = '$';
-      } else if (str.startsWith('\\[') && str.endsWith('\\]')) {
-        content = str.slice(2, -2);
-        openDel = '\\['; closeDel = '\\]';
-      } else if (str.startsWith('\\(') && str.endsWith('\\)')) {
-        content = str.slice(2, -2);
-        openDel = '\\('; closeDel = '\\)';
-      } else {
-        content = str;
-        openDel = '$'; closeDel = '$';
-      }
-
-      content = sanitizeLaTeX(content.trim());
-      mathStore.push(openDel + content + closeDel);
-      return `\x00MATH${mathStore.length - 1}\x00`;
-    }
-
-    let text = autoWrapLaTeX(raw);
-
-    text = text.replace(/\$\$([\s\S]*?)\$\$/g, (_, inner) => saveMath(`$$${inner}$$`));
-    text = text.replace(/\\\[([\s\S]*?)\\\]/g, (_, inner) => saveMath(`\\[${inner}\\]`));
-    text = text.replace(/\\\(([^)]*?)\\\)/g, (_, inner) => saveMath(`\\(${inner}\\)`));
-    text = text.replace(/\$([^$\n]{1,400}?)\$/g, (match, inner) => {
-      if (/[a-zA-Z0-9\\{}^_]/.test(inner)) return saveMath(`$${inner}$`);
-      return match;
-    });
-
-    text = text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    const codeStore = [];
-    text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
-      const html = `<pre><code class="language-${lang}">${code.trim()}</code></pre>`;
-      codeStore.push(html);
-      return `\x00CODE${codeStore.length - 1}\x00`;
-    });
-
-    text = text.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-
-    text = text.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-    text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-    text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-
-    text = text.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
-    text = text.replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>');
-    text = text.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-    text = text.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
-    text = text.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
-    text = text.replace(/_([^_\n]+)_/g, '<em>$1</em>');
-    text = text.replace(/~~([^~\n]+)~~/g, '<del>$1</del>');
-    text = text.replace(/^---+$/gm, '<hr>');
-
-    text = text.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-    text = text.replace(/<\/blockquote>\n<blockquote>/g, '\n');
-
-    text = text.replace(/^(\d+)\. (.+)$/gm, '<li data-ol="true">$2</li>');
-    text = text.replace(/^[\*\-\+] (.+)$/gm, '<li>$1</li>');
-
-    text = text.replace(/((?:<li(?:[^>]*)>[\s\S]*?<\/li>\n?)+)/g, (match) => {
-      if (match.includes('data-ol="true"')) {
-        return `<ol>${match.replace(/ data-ol="true"/g, '')}</ol>`;
-      }
-      return `<ul>${match}</ul>`;
-    });
-    text = text.replace(/<\/ul>\s*<ul>/g, '');
-    text = text.replace(/<\/ol>\s*<ol>/g, '');
-
-    text = text.replace(/(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g, (tableStr) => {
-      const rows = tableStr.trim().split('\n');
-      const headers = rows[0].split('|').filter(c => c.trim());
-      const body = rows.slice(2);
-      let html = '<table><thead><tr>';
-      headers.forEach(h => html += `<th>${h.trim()}</th>`);
-      html += '</tr></thead><tbody>';
-      body.forEach(row => {
-        const cols = row.split('|').filter(c => c.trim());
-        if (cols.length) {
-          html += '<tr>';
-          cols.forEach(c => html += `<td>${c.trim()}</td>`);
-          html += '</tr>';
-        }
-      });
-      html += '</tbody></table>';
-      return html;
-    });
-
-    text = text.replace(/\n\n+/g, '</p><p>');
-    text = text.replace(/\n/g, '<br>');
-
-    if (!/^<(h[1-6]|ul|ol|pre|blockquote|table|hr|p)/.test(text.trim())) {
-      text = `<p>${text}</p>`;
-    }
-
-    text = text.replace(/<p><\/p>/g, '');
-    text = text.replace(/<p>(<(?:h[1-6]|ul|ol|pre|blockquote|table|hr)[^>]*>)/g, '$1');
-    text = text.replace(/((?:<\/h[1-6]>|<\/ul>|<\/ol>|<\/pre>|<\/blockquote>|<\/table>|<hr>))<\/p>/g, '$1');
-
-    text = text.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeStore[parseInt(i)]);
-    text = text.replace(/\x00MATH(\d+)\x00/g, (_, i) => mathStore[parseInt(i)]);
-
-    return text;
-  }
-
-  function escapeHtml(text) {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  document.getElementById('api-key-input').addEventListener('keydown', e => {
-    if (e.key === 'Enter') saveApiKey();
-  });
 </script>
 </body>
 </html>
